@@ -1,0 +1,71 @@
+{
+  "name": "debug-web",
+  "version": "1.0.0",
+  "description": "Browser debug utility",
+  "keywords": [
+    "browser",
+    "debug",
+    "web",
+    "log"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "README.es.md",
+    "README.de.md",
+    "README.zh.md",
+    "README.ru.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rollup -c --configPlugin @rollup/plugin-typescript",
+    "build:pack": "npm run build && npm pack",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "@types/node": "^20.19.27",
+    "@vitest/coverage-istanbul": "^4.0.15",
+    "eslint": "^9.39.2",
+    "globals": "^16.5.0",
+    "happy-dom": "^20.0.11",
+    "jiti": "^2.6.1",
+    "rollup": "^3.0.0",
+    "rollup-plugin-dts": "6.3.0",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.8.1",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.49.0",
+    "vitest": "^4.0.15"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Karlen-ll/debug-web.git"
+  },
+  "author": {
+    "name": "Karlen",
+    "email": "ll.karlen@gmail.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Karlen-ll/debug-web/issues"
+  },
+  "homepage": "https://github.com/Karlen-ll/debug-web#readme"
+}
