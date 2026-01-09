@@ -21,7 +21,7 @@
 - [API](#api-)
 - [扩展功能](#扩展功能)
 
-## 其他语言版本
+## 翻译版本
 
 [English](README.md), [Español](README.es.md), [Deutsch](README.de.md), [中文](README.zh.md), [Русский](README.ru.md)
 

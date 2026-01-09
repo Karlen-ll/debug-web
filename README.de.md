@@ -21,7 +21,7 @@ Leichtgewichtige Bibliothek für Browser-Debugging.
 - [API](#api-)
 - [Erweiterung der Funktionalität](#erweiterung-der-funktionalität)
 
-## Andere Sprachversionen
+## Übersetzungen
 
 [English](README.md), [Español](README.es.md), [Deutsch](README.de.md), [中文](README.zh.md), [Русский](README.ru.md)
 

@@ -21,7 +21,7 @@ Lightweight browser debugging library.
 - [API](#api-)
 - [Extending Functionality](#extending-functionality)
 
-## Other Language Versions
+## Languages
 
 [English](README.md), [Español](README.es.md), [Deutsch](README.de.md), [中文](README.zh.md), [Русский](README.ru.md)
 

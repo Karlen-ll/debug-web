@@ -21,7 +21,7 @@ Librería ligera para depuración en el navegador.
 - [API](#api-)
 - [Extensión de Funcionalidad](#extensión-de-funcionalidad)
 
-## Otras Traducciones
+## Traducciones
 
 [English](README.md), [Español](README.es.md), [Deutsch](README.de.md), [中文](README.zh.md), [Русский](README.ru.md)
 

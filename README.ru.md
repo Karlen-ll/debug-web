@@ -21,7 +21,7 @@
 - [API](#api-)
 - [Расширение функциональности](#расширение-функциональности)
 
-## Другие языковые версии
+## Переводы
 
 [English](README.md), [Español](README.es.md), [Deutsch](README.de.md), [中文](README.zh.md), [Русский](README.ru.md)
 
