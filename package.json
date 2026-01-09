@@ -4,7 +4,9 @@
   "description": "Browser debug utility",
   "keywords": [
     "browser",
+    "console",
     "debug",
+    "level",
     "web",
     "log"
   ],
