@@ -1,5 +1,5 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest';
-import { getWindowKey } from '@/utils';
+import { getWindowKey, isDefined } from '@/utils';
 import { DebugWeb } from '@/debugWeb';
 import {
   TEST_MESSAGE,
@@ -19,7 +19,7 @@ describe('WebDebug', () => {
   beforeEach(() => {
     DebugWeb.reset();
 
-    if (typeof window !== 'undefined') {
+    if (isDefined(window)) {
       delete window[getWindowKey(DEFAULT_APP_NAME, true)];
       delete window[getWindowKey(TEST_APP_NAME, true)];
 

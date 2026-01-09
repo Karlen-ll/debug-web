@@ -4,6 +4,7 @@ Librería ligera para depuración en el navegador.
 **Ventajas**:
 - 🚀 **Sin dependencias** — solo TypeScript puro;
 - 📦 **Peso ~3.0 kB** — impacto mínimo en el bundle;
+- 🏅 **Calificación `A` de SonarQube** — máxima calidad y fiabilidad del código.
 - 🎨 **Estilización de salida de consola** — formato coloreado para identificación rápida;
 - 💾 **Almacenamiento global** — accede a datos de depuración mediante `window`.
 

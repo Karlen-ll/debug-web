@@ -4,6 +4,7 @@ Lightweight browser debugging library.
 **Advantages**:
 - 🚀 **No dependencies** — pure TypeScript only;
 - 📦 **Size ~3.0 kB** — minimal bundle impact;
+- 🏅 **SonarQube `A` rating** — highest code quality and reliability.
 - 🎨 **Console output styling** — colored formatting for quick identification;
 - 💾 **Global storage** — access debug data via `window`.
 
