@@ -1,5 +1,7 @@
 # Debug Web
-Librería ligera para depuración en el navegador.
+
+Paquete NPM de utilidad de depuración para navegadores con niveles de registro configurables (log, warn, error, debug).
+Ligero y fácil de usar.
 
 **Ventajas**:
 - 🚀 **Sin dependencias** — solo TypeScript puro;
@@ -166,7 +168,7 @@ export class CustomDebug extends WebDebug {
 }
 ```
 
-## Apoyo
+## Apoyo ❤️
 
 Si encuentras útil esta librería, considera apoyar su desarrollo:
 

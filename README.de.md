@@ -1,5 +1,7 @@
 # Debug Web
-Leichtgewichtige Bibliothek für Browser-Debugging.
+
+NPM-Paket als Browser-Debug-Hilfsprogramm mit konfigurierbaren Log-Levels (log, warn, error, debug).
+Leichtgewichtig und einfach zu verwenden.
 
 **Vorteile**:
 - 🚀 **Keine Abhängigkeiten** — nur reines TypeScript;
@@ -165,7 +167,7 @@ export class CustomDebug extends WebDebug {
 }
 ```
 
-## Unterstützung
+## Unterstützung ❤️
 
 Wenn Sie diese Bibliothek nützlich finden, erwägen Sie eine Unterstützung der Entwicklung:
 

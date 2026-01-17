@@ -1,5 +1,7 @@
 # Debug Web
-Lightweight browser debugging library.
+
+Browser debug utility npm package with configurable logging levels (log, warn, error, debug).
+Lightweight and easy to use.
 
 **Advantages**:
 - 🚀 **No dependencies** — pure TypeScript only;
@@ -166,7 +168,7 @@ export class CustomDebug extends WebDebug {
 }
 ```
 
-## Support
+## Support ❤️
 
 If you find this library useful, consider supporting its development:
 

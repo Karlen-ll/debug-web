@@ -1,5 +1,6 @@
 # Debug Web
-轻量级浏览器调试库。
+
+用于浏览器调试的 NPM 工具包，具有可配置的日志级别（log、warn、error、debug）。轻量级且易于使用。
 
 **优点**:
 - 🚀 **无依赖** — 仅使用纯 TypeScript;
@@ -166,7 +167,7 @@ export class CustomDebug extends WebDebug {
 }
 ```
 
-## 支持
+## 支持 ❤️
 
 如果您觉得这个库有用，请考虑支持其开发：
 
