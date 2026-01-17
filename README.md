@@ -1,12 +1,12 @@
 # Debug Web
 
-Browser debug utility npm package with configurable logging levels (log, warn, error, debug).
+Browser debug utility npm package with configurable logging levels (log, warn, error, debug).\
 Lightweight and easy to use.
 
 **Advantages**:
 - 🚀 **No dependencies** — pure TypeScript only;
 - 📦 **Size ~3.0 kB** — minimal bundle impact;
-- 🏅 **SonarQube `A` rating** — highest code quality and reliability.
+- 🏅 **SonarQube `A` rating** — highest code quality and reliability;
 - 🎨 **Console output styling** — colored formatting for quick identification;
 - 💾 **Global storage** — access debug data via `window`.
 

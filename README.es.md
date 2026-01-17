@@ -1,12 +1,12 @@
 # Debug Web
 
-Paquete NPM de utilidad de depuración para navegadores con niveles de registro configurables (log, warn, error, debug).
+Paquete NPM de utilidad de depuración para navegadores con niveles de registro configurables (log, warn, error, debug).\
 Ligero y fácil de usar.
 
 **Ventajas**:
 - 🚀 **Sin dependencias** — solo TypeScript puro;
 - 📦 **Peso ~3.0 kB** — impacto mínimo en el bundle;
-- 🏅 **Calificación `A` de SonarQube** — máxima calidad y fiabilidad del código.
+- 🏅 **Calificación `A` de SonarQube** — máxima calidad y fiabilidad del código;
 - 🎨 **Estilización de salida de consola** — formato coloreado para identificación rápida;
 - 💾 **Almacenamiento global** — accede a datos de depuración mediante `window`.
 

@@ -1,12 +1,12 @@
 # Debug Web
 
-NPM-Paket als Browser-Debug-Hilfsprogramm mit konfigurierbaren Log-Levels (log, warn, error, debug).
+NPM-Paket als Browser-Debug-Hilfsprogramm mit konfigurierbaren Log-Levels (log, warn, error, debug).\
 Leichtgewichtig und einfach zu verwenden.
 
 **Vorteile**:
 - 🚀 **Keine Abhängigkeiten** — nur reines TypeScript;
 - 📦 **Größe ~3.0 kB** — minimaler Einfluss auf das Bundle;
-- 🏅 **SonarQube `A`-Bewertung** — höchste Codequalität und Zuverlässigkeit.
+- 🏅 **SonarQube `A`-Bewertung** — höchste Codequalität und Zuverlässigkeit;
 - 🎨 **Konsole-Ausgabe-Styling** — farbige Formatierung für schnelle Identifizierung;
 - 💾 **Globale Speicherung** — Zugriff auf Debug-Daten über `window`.
 
