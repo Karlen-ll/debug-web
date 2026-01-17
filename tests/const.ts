@@ -1,4 +1,4 @@
-export const DEFAULT_APP_NAME = '__web_debug__' as const;
+export const DEFAULT_APP_NAME = '__debug_web__' as const;
 export const DEFAULT_PROP_NAME = 'info' as const;
 
 export const TEST_APP_NAME = 'core' as const;

@@ -54,7 +54,7 @@ Priorität (niedrig nach hoch):
 
 | Parameter | Typ                             | Standardwert                   | Beschreibung                                                             |
 |-----------|---------------------------------|--------------------------------|--------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'__web_debug__'`              | Eindeutiger App-Name zur Trennung von Daten verschiedener Anwendungen    |
+| `app`     | `string` \| `null`              | `'__debug_web__'`              | Eindeutiger App-Name zur Trennung von Daten verschiedener Anwendungen    |
 | `level`   | `DebugLogLevel`                 | `'log'`                        | Minimales Log-Level (Nachrichten darunter werden nicht ausgegeben)       |
 | `prop`    | `string` \| `null`              | `'info'`                       | NName der globalen Variable für Datenzugriff über `window[prop]`         |
 | `data`    | `Record<string, unknown>`       | —                              | Initiale Debug-Daten, die sofort nach Initialisierung gespeichert werden |

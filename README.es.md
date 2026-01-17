@@ -54,7 +54,7 @@ Prioridad (de menor a mayor):
 
 | Parámetro | Tipo                            | Por Defecto                        | Descripción                                                               |
 |-----------|---------------------------------|------------------------------------|---------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'__web_debug__'`                  | Nombre único de la app para separar datos de diferentes aplicaciones      |
+| `app`     | `string` \| `null`              | `'__debug_web__'`                  | Nombre único de la app para separar datos de diferentes aplicaciones      |
 | `level`   | `DebugLogLevel`                 | `'log'`                            | Nivel mínimo de registro (mensajes por debajo no se imprimen)             |
 | `prop`    | `string` \| `null`              | `'info'`                           | Nombre de la variable global para acceder a datos mediante `window[prop]` |
 | `data`    | `Record<string, unknown>`       | —                                  | Datos de depuración iniciales guardados tras la inicialización            |

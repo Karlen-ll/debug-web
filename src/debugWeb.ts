@@ -30,7 +30,7 @@ export interface DebugWebOptions {
 
 const LEVEL_INFO = 2;
 const LEVEL_ERROR = 4;
-const DEFAULT_VALUE = { app: '__web_debug__', prop: 'info' };
+const DEFAULT_VALUE = { app: '__debug_web__', prop: 'info' };
 
 /**
  * Class for centralized collection and output of debugging information

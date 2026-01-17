@@ -54,7 +54,7 @@ Priority (lowest to highest):
 
 | Parameter | Type                            | Default                       | Description                                                   |
 |-----------|---------------------------------|-------------------------------|---------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'__web_debug__'`             | Unique app name to separate data from different applications  |
+| `app`     | `string` \| `null`              | `'__debug_web__'`             | Unique app name to separate data from different applications  |
 | `level`   | `DebugLogLevel`                 | `'log'`                       | Minimum log level (messages below this level are not printed) |
 | `prop`    | `string` \| `null`              | `'info'`                      | Name of global variable to access data via `window[prop]`     |
 | `data`    | `Record<string, unknown>`       | —                             | Initial debug data saved immediately after initialization     |
