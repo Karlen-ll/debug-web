@@ -1,14 +1,15 @@
 # Debug Web
 
-用于浏览器调试的 NPM 工具包，具有可配置的日志级别（log、warn、error、debug）。\
-轻量级且易于使用。
+用于浏览器调试的 NPM 包，具有可自定义的日志级别（log、warn、error、debug）。\
+轻量且易于使用。
 
-**优点**:
-- 🚀 **无依赖** — 仅使用纯 TypeScript;
-- 📦 **大小约 3.0 kB** — 对打包体积影响极小;
-- 🏅 **SonarQube `A` 评级** — 代码质量与可靠性最高评级;
-- 🎨 **控制台输出样式** — 彩色格式化，便于快速识别;
-- 💾 **全局存储** — 通过 `window` 访问调试数据。
+**特点**:
+- 🚀 **无依赖** — 纯 TypeScript 编写；
+- 📦 **体积 ~3.5 kB** — 对打包体积影响极小；
+- 🏅 **SonarQube `A` 评级** — 最高级别的代码质量和可靠性；
+- 🎨 **控制台输出样式** — 彩色格式化，便于快速识别；
+- 💾 **全局存储** — 通过 `window` 访问调试数据；
+- 🔧 **灵活配置** — 支持日志级别、样式、别名及继承。
 
 ---
 
@@ -18,10 +19,14 @@
 - [日志级别](#日志级别-)
 - [选项](#选项-)
 - [默认样式](#默认样式-)
-- [使用方法](#使用方法-)
-- [样式自定义](#样式自定义-)
 - [API](#api-)
-- [扩展功能](#扩展功能)
+  - [createDebug](#createdebug-函数)
+  - [日志记录方法](#日志记录方法)
+  - [数据处理](#数据处理)
+  - [级别管理](#级别管理)
+- [调试数据](#调试数据)
+- [支持](#支持-)
+- [许可证](#许可证)
 
 ## 翻译版本
 
@@ -40,25 +45,28 @@ yarn add debug-web
 
 ## 日志级别 🔧
 
-优先级（从低到高）:
+优先级（从低到高）：
 
 1. `debug` (0) — 调试信息 (`console.debug`);
-2. `log` (1) — 基本消息 (`console.log`)
-3. `info` (2) — 信息性消息 (`console.info`)
+2. `log` (1) — 基础消息 (`console.log`)
+3. `info` (2) — 提示信息 (`console.info`)
 4. `warn` (3) — 警告 (`console.warn`)
 5. `error` (4) — 错误 (`console.error`)
 
-ℹ️ 自定义级别: 任何字符串值（包括 `success`）都将被视为 `info` 级别。
+ℹ️ 自定义级别：任何字符串值（例如 `success`、`focus`）都将作为 `info` 级别处理，并且可以拥有独立的样式。
 
 ## 选项 ⚙️
 
-| 参数      | 类型                              | 默认值               | 描述                                |
-|---------|---------------------------------|-------------------|-----------------------------------------|
-| `app`   | `string` \| `null`              | `'__debug_web__'` | 用于区分不同应用数据的唯一应用名称            |
-| `level` | `DebugLogLevel`                 | `'log'`           | 最低日志级别（低于此级别的消息不会打印）       |
-| `prop`  | `string` \| `null`              | `'info'`          | 用于通过 `window[prop]` 访问数据的全局变量名 |
-| `data`  | `Record<string, unknown>`       | —                 | 初始化后立即保存的初始调试数据               |
-| `style` | `Record<DebugLogLevel, string>` | 参见 [下方](#默认样式-)   | 为不同级别的消息自定义 CSS 样式        |
+| 参数        | 类型                              | 默认值            | 描述                                              |
+|-----------|---------------------------------|----------------|-------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'` | 唯一的应用程序名称，用于分离数据                                |
+| `level`   | `DebugLogLevel`                 | `'log'`        | 最低日志级别（低于此级别的消息将不会输出）                           |
+| `prop`    | `string` \| `null`              | `'info'`       | 用于访问数据的全局变量名（`null` — 不创建）                      |
+| `data`    | `Record<string, unknown>`       | —              | 初始调试数据                                          |
+| `local`   | `boolean`                       | `false`        | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
+| `native`  | `boolean`                       | `false`        | 使用原生控制台方法（不带样式）                                 |
+| `aliases` | `Record<string, DebugLogLevel>` | '{}'           | `createDebug` 的自定义别名                            |
+| `style`   | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式-) | 日志级别的 CSS 样式                                    |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
@@ -70,107 +78,110 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
-| `warn`    | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
-| `error`   | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
+| `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
+| `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
+| `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
-## 使用方法 💡
+## 如何使用 💡
 
-### 初始化
+### 创建实例
 
-在应用程序入口点（`main.js` / `app.js`）调用一次:
+```typescript
+// debug.ts
+import { DebugWeb } from 'debug-web';
 
-```javascript
-import { debugInit } from 'debug-web';
-
-debugInit({
-  level: isDev ? 'debug' : 'error',
-  data: { version: env.VERSION, buildTime: env.BUILD_TIMESTAMP }
+export const debug = new DebugWeb({
+  app: 'my-app',
+  level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
+  data: { version: APP_VERSION },
+  aliases: { s: 'success', f: 'focus' },
+  local: true,
 });
 ```
 
-### 日志记录
+### API 📚
 
-在应用程序的任何位置使用以输出消息:
+#### `createDebug` 函数
 
-```javascript
-import { debug, log, info, success, warn, error } from 'debug-web';
+创建一个支持别名和自定义级别的代理。
 
-debug('调试消息');
-log('常规消息');
-info('信息性消息');
-success('成功！');
-warn('警告！');
-error(new Error());
+```typescript
+<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
+
+默认别名: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
+#### 日志记录方法
+
+| 级别           | 类型                                                                     |
+|--------------|------------------------------------------------------------------------|
+| `debug`      | `(message?: unknown, ...attrs: unknown[]) => void`                     |
+| `log`        | `(...attrs: unknown[]) => void`                                        |
+| `info`       | `(...attrs: unknown[]) => void`                                        |
+| `warn`       | `(...attrs: unknown[]) => void`                                        |
+| `error`      | `(...attrs: unknown[]) => void`                                        |
+| `group`      | `(open?: boolean, level?: DebugLogLevel, ...attrs: unknown[]) => void` |
+| `groupEnd`   | `(level?: DebugLogLevel) => void`                                      |
+| `dir`        | `(value: unknown, options?: unknown) => void`                          |
+| `dirxml`     | `(...attrs: unknown[]) => void`                                        |
+| `trace`      | `(...attrs: unknown[]) => void`                                        |
+| `table`      | `(data: unknown, properties?: string[]) => void`                       |
+| `count`      | `(label?: string) => void`                                             |
+| `countReset` | `(label?: string) => void`                                             |
+| `time`       | `(label?: string) => void`                                             |
+| `timeLog`    | `(label?: string, ...attrs: unknown[]) => void`                        |
+| `timeEnd`    | `(label?: string) => void`                                             |
+
+#### 数据处理
+
+| 方法     | 类型                                                | 注释                            |
+|--------|---------------------------------------------------|-------------------------------|
+| `set`  | `(data: DebugWebData) => void`                    | 保存调试数据（合并数据）                  |
+| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | 返回所有数据的副本。如果传入 `true`，则添加辅助方法 |
+| `dump` | `(keys: string[], options?: DumpOptions) => void` | 以表格形式输出数据（忽略日志级别）             |
+
+
+```typescript
+type DumpOptions = {
+  level?: DebugLogLevel;
+  title?: string | ((data) => string);
+  open?: boolean;
+}
+```
+
+#### 级别管理
+
+| 方法         | 类型                                       | 注释                            |
+|------------|------------------------------------------|-------------------------------|
+| `setLevel` | `(level: DebugLogLevel \| true) => void` | 设置最低级别；传入 `true` 则重置为 `'log'` |
+
+#### 样式设置
+
+| 方法         | 类型                                              | 注释        |
+|------------|-------------------------------------------------|-----------|
+| `setStyle` | `(level: DebugLogLevel, style: string) => void` | 为某个级别设置样式 |
+| `setStyle` | `(styles: DebugWebStyle) => void`               | 设置多个样式    |
+| `getStyle` | `() => DebugWebStyle`                           | 返回当前样式    |
 
 ### 调试数据
 
-保存调试数据，可通过全局变量访问:
+保存任意数据并在控制台中查看：
 
 ```javascript
-import { debugData } from 'debug-web';
-
-debugData({ lastError: null, prevRoute: '/home', bus: ['ui:modal-opened'] });
+debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-💡 提示: 在 DevTools 中输入 `info`（或其他 `prop` 值）以获取所有保存的数据。
-
-## 样式自定义 🖌️
+可以通过 `window[prop]`（默认是 `info`）访问数据。
+在浏览器控制台中输入：
 
 ```javascript
-import { debugSetStyle } from 'debug-web';
-
-// 更改特定级别的样式
-debugSetStyle('info', 'color: purple; font-weight: bold;');
-
-// 或同时更改多个级别
-debugSetStyle({ info: 'color: #9b59b6;', success: 'color: #27ae60;' });
-```
-
-## API 📚
-
-### 日志方法
-
-支持所有主要的 `console` 方法:
-
-- `debug`, `log`, `info`, `warn`, `error`;
-- `group` (`groupCollapsed`), `groupEnd`;
-- `trace`, `count`, `countReset`;
-- `time`, `timeLog`, `timeEnd`;
-- `dir`, `dirxml`, `table`.
-
-### 辅助方法
-
-- `debugData` — 添加调试数据（与现有数据合并）;
-- `debugSetStyle` — 更改日志级别的 CSS 样式;
-- `debugGetStyle` — 获取当前样式设置;
-- `debugReset`.
-
-## 扩展功能
-
-您可以创建自己的类以添加自定义日志方法:
-
-```ts
-export class CustomDebug extends WebDebug {
-  static {
-    // 为自定义级别添加新样式
-    CustomDebug.setStyle({ ...WebDebug._style, 'customEvent': 'color: #00ff00' });
-  }
-
-  // 创建新的日志方法
-  static customEvent(...attrs: unknown[]) {
-    // 检查是否允许 'info' 级别（自定义级别等同于该级别）
-    if (!CustomDebug.can('info')) return;
-
-    // 使用内部方法进行格式化和输出
-    CustomDebug.print('info', 'customEvent', attrs);
-  }
-}
+  info // { error: null, user: {...}, setLevel: f }
+  info.setLevel() // 修改日志级别
 ```
 
 ## 支持 ❤️
 
-如果您觉得这个库有用，请考虑支持其开发：
+如果这个库对您有帮助，请考虑支持它的开发。
 
 - [Patreon](https://www.patreon.com/collection/1924882)
 - [Boosty](https://boosty.to/karlen/donate)

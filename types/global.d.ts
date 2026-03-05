@@ -1,12 +1,12 @@
-import type { WebDebugData } from '@/shared/lib/debug/webDebug';
+import type { DebugWebData } from '@/debugWeb';
 
 declare global {
   interface Window {
     // Default prop name
-    info?: WebDebugData
+    info?: DebugWebData
 
     // Test prop name
-    debug?: WebDebugData
+    debug?: DebugWebData
   }
 }
 

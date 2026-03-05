@@ -1,296 +1,251 @@
-import { stylizeAttrs, defaultStyle } from './stylize';
-import { getWindowKey, isDefined, isString } from '@/utils';
+import { defaultStyle, stylizeAttrs } from './stylize';
+import { isSSR, isString, isFunc, getArray, getWindowKey, getGroupMethod, getStoredLvl, setStoredLvl } from '@/utils';
+import { DEFAULT_LVL_MAP, DEBUG, LOG, INFO, WARN, ERROR } from '@/const';
+import type { ConsoleMethod, DebugWebData, DebugWebLogLevel, DebugWebOptions, DebugWebStyle } from '@/types';
 
-type ConsoleMethod = 'debug' | 'log' | 'info' | 'warn' | 'error' | 'group' | 'groupCollapsed';
-
-export type DebugWebLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
-
-export type DebugWebData = Record<string, unknown>
-export type DebugWebStyle = Partial<Record<DebugWebLogLevel, string | null>>
-
-export interface DebugWebOptions {
-  /** Unique application name
-   * @desc Required to separate data of different applications in the same environment */
-  app?: string | null;
-
-  /** Allowed logging level
-   * @desc Custom values will default to 'info' */
-  level?: DebugWebLogLevel;
-
-  /** Variable name in window (if null, do not create)
-   * @default 'info' */
-  prop?: string | null;
-
-  /** Important debugging data */
-  data?: DebugWebData;
-
-  /** Styles map for different logging levels */
-  style?: DebugWebStyle;
-}
-
-const LEVEL_INFO = 2;
-const LEVEL_ERROR = 4;
-const DEFAULT_VALUE = { app: '__debug_web__', prop: 'info' };
-
-/**
- * Class for centralized collection and output of debugging information
- * @singleton
- */
+/** Class for centralized collection and output of debugging information */
 export class DebugWeb {
-  protected static _level: number = 0;
-  protected static _app = DEFAULT_VALUE.app;
-  protected static _prop: string | null = DEFAULT_VALUE.prop;
-  protected static _style: DebugWebStyle = defaultStyle;
-  protected static _levelMap: Partial<Record<DebugWebLogLevel, number>> = {
-    'debug': 0,
-    'log': 1,
-    'info': 2,
-    'warn': 3,
-    'error': 4
-  };
+  declare protected _lvl: number;
+  declare protected _app: string;
+  declare protected _prop: string | null;
+  declare protected _style: DebugWebStyle;
+  declare protected _native: boolean;
+  declare protected _local: boolean;
+  declare protected _lvlMap: Partial<Record<DebugWebLogLevel, number>>;
 
-  protected constructor() {
-    // Protected constructor for Singleton
-  }
+  constructor(options?: DebugWebOptions) {
+    this._app = options?.app || '_debug_web';
+    this._prop = options?.prop ?? INFO;
+    this._lvlMap = DEFAULT_LVL_MAP;
+    this._lvl = this.calcLvl(options?.level);
+    this._native = options?.native ?? false;
+    this._local = options?.local ?? false;
+    this._style = { ...defaultStyle, ...options?.style };
 
-  /**
-   * Creates a Debug instance
-   * @desc Called once at the application entry point
-   * @example WebDebug.init({ level: 'error' })
-   */
-  static init(options?: DebugWebOptions) {
-    if (options) {
-      if (options.app?.trim()) {
-        DebugWeb._app = options.app;
-      }
-
-      if (isDefined(options.level)) {
-        DebugWeb._level = DebugWeb.getLevel(options.level);
-      }
-
-      if (isDefined(options.prop)) {
-        DebugWeb._prop = options.prop;
-      }
-
-      if (options.style) {
-        DebugWeb.setStyle(options.style);
-      }
-
-      if (options.data) {
-        DebugWeb.set(options.data);
-      }
+    if (options?.data) {
+      this.set(options.data);
     }
 
-    DebugWeb.attach();
+    this.attach();
   }
 
-  /** Create window.info property for data access */
-  static attach() {
-    if (!DebugWeb._prop || !isDefined(window)) {
-      return;
-    }
+  /** Create window property for data access */
+  attach() {
+    if (!this._prop || isSSR()) return;
 
-    Object.defineProperty(window, DebugWeb._prop, { get: () => DebugWeb.get(), configurable: true });
+    Object.defineProperty(window, this._prop, { get: () => this.get(true), configurable: true });
   }
 
-  /** Output message to Web console
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/log_static console.log} */
-  static log(...attrs: unknown[]) {
-    if (!DebugWeb.can()) return;
-    DebugWeb.print('log', 'log', attrs);
+  /** Output message to Web console */
+  log(...attrs: unknown[]) {
+    this.call(LOG, attrs, LOG, true);
   }
 
-  /** Output informational message
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/info_static console.info} */
-  static info(...attrs: unknown[]) {
-    if (!DebugWeb.can('info')) return;
-    DebugWeb.print('info', 'info', attrs);
+  /** Output informational message */
+  info(...attrs: unknown[]) {
+    this.call(INFO, attrs, INFO, true);
   }
 
-  /** Output success message
-   * @desc Uses the `console.info` */
-  static success(...attrs: unknown[]) {
-    if (!DebugWeb.can('success')) return;
-    DebugWeb.print('info', 'success', attrs);
+  /** Output warning message */
+  warn(...attrs: unknown[]) {
+    this.call(WARN, attrs, WARN);
   }
 
-  /** Output warning message
-   * @desc Method is not styled
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/warn_static console.warn} */
-  static warn(...attrs: unknown[]) {
-    if (!DebugWeb.can('warn')) return;
-    console.warn(...attrs);
+  /** Output error message */
+  error(...attrs: unknown[]) {
+    this.call(ERROR, attrs, ERROR);
   }
 
-  /** Output error message
-   * @desc Method is not styled
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/error_static console.error} */
-  static error(error: Error | string, ...attrs: unknown[]) {
-    if (!DebugWeb.can('error')) return;
+  /** Output debug message with low priority */
+  debug(message?: unknown, ...attrs: unknown[]) {
+    this.call(DEBUG, [message, ...attrs], DEBUG);
+  }
 
-    if (error instanceof Error) {
-      if (DebugWeb._level < LEVEL_ERROR && error.stack) {
-        console.error(error.message, error.stack, ...attrs);
-      } else {
-        console.error(error.message, ...attrs);
+  /** Open a group */
+  group(open?: boolean, level: DebugWebLogLevel = LOG, ...attrs: unknown[]) {
+    this.call(getGroupMethod(open), attrs, level, true);
+  }
+
+  /** Close the group */
+  groupEnd(level: DebugWebLogLevel = LOG) {
+    this.call('groupEnd', [], level);
+  }
+
+  /** Output an object */
+  dir(value: unknown, options?: unknown) {
+    this.call('dir', [value, options], LOG);
+  }
+
+  /** Output XML/HTML tree of elements */
+  dirxml(...attrs: unknown[]) {
+    this.call('dirxml', attrs, LOG);
+  }
+
+  /** Log number of times called with given label */
+  count(label?: string) {
+    this.call('count', label, LOG);
+  }
+
+  /** Reset counter for the given label */
+  countReset(label?: string) {
+    this.call('countReset', label, LOG);
+  }
+
+  /** Output stack trace */
+  trace(...attrs: unknown[]) {
+    this.call('trace', attrs);
+  }
+
+  /** Output a table */
+  table(data: unknown, properties?: string[]) {
+    this.call('table', [data, properties]);
+  }
+
+  /** Start timer for execution time measurement */
+  time(label?: string) {
+    this.call('time', label);
+  }
+
+  /** Output current timer value */
+  timeLog(label?: string, ...attrs: unknown[]) {
+    this.call('timeLog', [label, ...attrs]);
+  }
+
+  /** Finish execution time measurement */
+  timeEnd(label?: string) {
+    this.call('timeEnd', label);
+  }
+
+  /** Update debugging data */
+  set(data: DebugWebData) {
+    if (isSSR()) return;
+
+    const storageName = getWindowKey(this._app);
+    const value = Object.assign(window[storageName] || {}, data);
+
+    Object.keys(value).forEach(key => {
+      if (value[key] === undefined) {
+        delete value[key];
       }
-    } else {
-      console.error(error, ...attrs);
-    }
-  }
-
-  /** Output debug message with low priority
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/debug_static console.debug} */
-  static debug(message?: unknown, ...attrs: unknown[]) {
-    if (!DebugWeb.can('debug')) return;
-    console.debug(message, ...attrs);
-  }
-
-  /** Open a group (level: log)
-   * @desc level — only for styling, does not affect logging
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/group_static console.group} */
-  static group(collapsed?: boolean, level: DebugWebLogLevel = 'log', ...attrs: unknown[]) {
-    if (!DebugWeb.can()) return;
-    DebugWeb.print(collapsed ? 'groupCollapsed' : 'group', level, attrs);
-  }
-
-  /** Close the group (level: log)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/groupEnd_static console.groupEnd} */
-  static groupEnd() {
-    if (!DebugWeb.can()) return;
-    console.groupEnd();
-  }
-
-  /** Output an object (level: log)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/dir_static console.dir} */
-  static dir(value: unknown, options?: Parameters<typeof console.dir>[1]) {
-    if (!DebugWeb.can()) return;
-    console.dir(value, options);
-  }
-
-  /** Output XML/HTML tree of elements (level: log)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/dirxml_static console.dirxml} */
-  static dirxml(...attrs: unknown[]) {
-    if (!DebugWeb.can()) return;
-    console.dirxml(...attrs);
-  }
-
-  /** Log number of times called with given label (level: log)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/count_static console.count} */
-  static count(label?: string) {
-    if (!DebugWeb.can()) return;
-    console.count(label);
-  }
-
-  /** Reset counter for the given label (level: log)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/countReset_static console.countReset} */
-  static countReset(label?: string) {
-    if (!DebugWeb.can()) return;
-    console.countReset(label);
-  }
-
-  /** Output a table (level: info)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/table_static console.table} */
-  static table(data: unknown, properties?: Parameters<typeof console.table>[1]) {
-    if (!DebugWeb.can('info')) return;
-    console.table(data, properties);
-  }
-
-  /** Start timer for execution time measurement (level: info)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/time_static console.time} */
-  static time(label?: string) {
-    if (!DebugWeb.can('info')) return;
-    console.time(label);
-  }
-
-  /** Output current timer value (level: info)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/timeLog_static console.timeLog} */
-  static timeLog(label?: string, ...attrs: unknown[]) {
-    if (!DebugWeb.can('info')) return;
-    console.timeLog(label, ...attrs);
-  }
-
-  /** Finish execution time measurement (level: info)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/timeEnd_static console.timeEnd} */
-  static timeEnd(label?: string) {
-    if (!DebugWeb.can('info')) return;
-    console.timeEnd(label);
-  }
-
-  /** Output stack trace (level: log)
-   * @see {@link https://developer.mozilla.org/en-US/docs/Web/API/console/trace_static console.trace} */
-  static trace(message?: unknown, ...attrs: unknown[]) {
-    if (!DebugWeb.can()) return;
-    console.trace(message, ...attrs);
-  }
-
-  /**
-   * Update debugging data
-   * @desc Data is stored in the window object
-   * @example WebDebug.add({ mode })
-   */
-  static set(data: DebugWebData) {
-    if (!isDefined(window)) {
-      return;
-    }
-
-    const storageName = getWindowKey(DebugWeb._app, true);
-
-    Object.defineProperty(window, storageName, {
-      value: Object.assign(window[storageName] || {}, data),
-      writable: true,
-      enumerable: false,
-      configurable: true
     });
+
+    Object.defineProperty(window, storageName, { value, writable: true, enumerable: false, configurable: true });
   }
 
   /** Get all collected debugging data */
-  static get() {
-    return isDefined(window) ? window[getWindowKey(DebugWeb._app, true)] : undefined;
+  get(api?: boolean) {
+    if (isSSR()) return;
+
+    const data = { ...window[getWindowKey(this._app)] } as DebugWebData;
+
+    if (api) {
+      data.setLevel = this.setLevel.bind(this);
+    }
+
+    return data;
   }
 
-  /**
-   * Update styles map by logging level or entirely
-   * @example WebDebug.setStyle('info', 'color: #155adc')
-   * @example WebDebug.setStyle({ info: 'color: #155adc', warn: 'color: #ffa500' })
+  /** Display a formatted dump of debugging data by selected keys
+   * @param keys - Array of property names to include in the dump
+   * @param options - Configuration options for the dump display
+   * @param options.level - Logging level for the dump (default: 'info')
+   * @param options.title - Custom title or function that returns title based on data
+   * @param options.open - If true opens group expanded, if false collapsed (default: false)
+   * @desc Groups related debug data into a collapsible console section with table view
    */
-  static setStyle(levelOrMap: DebugWebLogLevel | DebugWebStyle, style?: string | null) {
+  dump(keys: string[], options?: {
+    level?: DebugWebLogLevel;
+    title?: string | ((data: DebugWebData) => string);
+    open?: boolean
+  }) {
+    const data = this.get();
+
+    if (!data || !keys.length) return;
+    const isSimple = !options?.title;
+
+    this.call(
+      getGroupMethod(options?.open),
+      [isSimple ? data[keys[0]] || keys[0] : isFunc(options.title) ? options.title(data) : options.title],
+      options?.level,
+      true,
+      true
+    );
+
+    this.call(
+      'table',
+      [keys.reduce<DebugWebData>((acc, key, index) => {
+        if (!(isSimple && index === 0) && typeof data[key] !== 'undefined') {
+          acc[key] = data[key];
+        }
+
+        return acc;
+      }, {})],
+      options?.level,
+      false,
+      true
+    );
+
+    this.call('groupEnd', [], options?.level, false, true);
+  }
+
+  /** Set logging level for filtering console output
+   * @param level - Target log level or true to reset to default ('log')
+   * @desc Reset to default level when called without arguments: debug.setLevel()
+   * @example debug.setLevel('error')
+   */
+  setLevel(level: DebugWebLogLevel | true = true) {
+    const lvl = level === true ? LOG : level;
+    const value = { num: this.getLvl(lvl), lvl };
+
+    if (value.num >= 0) {
+      this._lvl = value.num;
+      setStoredLvl(this._app, value.lvl, this._local);
+    }
+  }
+
+  /** Update styles map by logging level or entirely */
+  setStyle(levelOrMap: DebugWebLogLevel | DebugWebStyle, style?: string | null) {
     if (isString(levelOrMap)) {
-      DebugWeb._style[levelOrMap] = style;
+      this._style[levelOrMap] = style;
     } else {
-      Object.assign(DebugWeb._style, levelOrMap);
+      Object.assign(this._style, levelOrMap);
     }
   }
 
   /** Get styles map by logging level */
-  static getStyle(): DebugWebStyle {
-    return DebugWeb._style;
+  getStyle(): DebugWebStyle {
+    return this._style;
   }
 
-  /** Clear all debugging data and remove global references */
-  static reset() {
-    if (isDefined(window)) {
-      delete window[getWindowKey(DebugWeb._app, true)];
-      delete window[getWindowKey(DebugWeb._prop!)]; // Can be null, but it's okay
-    }
-
-    DebugWeb._level = 0;
-    DebugWeb._app = DEFAULT_VALUE.app;
-    DebugWeb._prop = DEFAULT_VALUE.prop;
+  /** Core method for logging with level filtering and formatting
+   * @param method - Console method to use (log, info, warn, etc.)
+   * @param attrs - Single value or array of values to log
+   * @param level - Logging level for filtering (default: based on method)
+   * @param stylize - Apply CSS styling to the output (default: false)
+   * @param force - Bypass level filtering and always output (default: false)
+   * @returns void, exits early if level is below current threshold (unless forced)
+   */
+  call(method: ConsoleMethod, attrs: unknown | unknown[], level?: DebugWebLogLevel, stylize = false, force = false) {
+    if (!force && this.getLvl(level, this.getLvl(INFO)) < this._lvl) return;
+    this.print(method, getArray(attrs), level, stylize ? !this._native : false);
   }
 
-  /** Check if logging level is enabled */
-  protected static can(level: DebugWebLogLevel = 'log'): boolean {
-    return DebugWeb.getLevel(level) >= DebugWeb._level;
+  /** Determine initial logging level based on stored value and options */
+  protected calcLvl(level?: DebugWebLogLevel): number {
+    const storedLevel = this.getLvl(getStoredLvl(this._app, this._local));
+    const value = storedLevel >= 0 ? storedLevel : this.getLvl(level);
+
+    return value >= 0 ? value : this.getLvl(LOG);
   }
 
   /** Get logging level priority number */
-  protected static getLevel(level: DebugWebLogLevel): number {
-    return DebugWeb._levelMap[level] ?? LEVEL_INFO;
+  protected getLvl(level?: DebugWebLogLevel | null, defaultValue = -1): number {
+    return (level ? this._lvlMap[level] : undefined) ?? defaultValue;
   }
 
   /** Format and output data using specified console method and level styling */
-  protected static print(method: ConsoleMethod, level: DebugWebLogLevel, attrs: unknown[]) {
-    console[method](...stylizeAttrs(attrs, DebugWeb._style[level]));
+  protected print(method: ConsoleMethod, attrs: unknown[], level: DebugWebLogLevel = INFO, stylize?: boolean) {
+    const args = stylize ? stylizeAttrs(attrs, this._style[level]) : attrs;
+    console[method](...args as never[]);
   }
 }

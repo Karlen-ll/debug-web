@@ -1,27 +1,32 @@
 # Debug Web
 
-Browser debug utility npm package with configurable logging levels (log, warn, error, debug).\
+NPM package for browser debugging with customizable logging levels (log, warn, error, debug).\
 Lightweight and easy to use.
 
-**Advantages**:
+**Features**:
 - 🚀 **No dependencies** — pure TypeScript only;
-- 📦 **Size ~3.0 kB** — minimal bundle impact;
-- 🏅 **SonarQube `A` rating** — highest code quality and reliability;
-- 🎨 **Console output styling** — colored formatting for quick identification;
-- 💾 **Global storage** — access debug data via `window`.
+- 📦 **Size ~3.5 kB** — minimal impact on your bundle;
+- 🏅 **SonarQube `A` Rating** — highest level of code quality and reliability;
+- 🎨 **Console output styling** — color formatting for quick identification;
+- 💾 **Global storage** — access debug data via `window`;
+- 🔧 **Flexible configuration** — logging levels, styles, aliases, inheritance support.
 
 ---
 
 ## Table of Contents 📑
 
 - [Installation](#installation-)
-- [Log Levels](#log-levels-)
+- [Log levels](#log-levels-)
 - [Options](#options-)
-- [Default Styles](#default-styles-)
-- [How to Use](#how-to-use-)
-- [Style Customization](#style-customization-)
+- [Default styles](#default-styles-)
 - [API](#api-)
-- [Extending Functionality](#extending-functionality)
+  - [createDebug](#createdebug-function)
+  - [Logging methods](#logging-methods)
+  - [Data handling](#data-handling)
+  - [Level management](#level-management)
+- [Debug data](#debug-data)
+- [Support](#support-)
+- [License](#license)
 
 ## Languages
 
@@ -40,7 +45,7 @@ yarn add debug-web
 
 ## Log Levels 🔧
 
-Priority (lowest to highest):
+Priority (from lowest to highest):
 
 1. `debug` (0) — debug information (`console.debug`);
 2. `log` (1) — basic messages (`console.log`)
@@ -48,124 +53,130 @@ Priority (lowest to highest):
 4. `warn` (3) —  warnings (`console.warn`)
 5. `error` (4) — errors (`console.error`)
 
-ℹ️ Custom levels: any string values (including `success`) will be treated as `info` level.
+ℹ️ Custom levels: any string values (e.g., `success`, `focus`) will be processed as `info` level and can have their own styles.
 
 ## Options ⚙️
 
-| Parameter | Type                            | Default                       | Description                                                   |
-|-----------|---------------------------------|-------------------------------|---------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'__debug_web__'`             | Unique app name to separate data from different applications  |
-| `level`   | `DebugLogLevel`                 | `'log'`                       | Minimum log level (messages below this level are not printed) |
-| `prop`    | `string` \| `null`              | `'info'`                      | Name of global variable to access data via `window[prop]`     |
-| `data`    | `Record<string, unknown>`       | —                             | Initial debug data saved immediately after initialization     |
-| `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles-) | Custom CSS styles for messages of different levels            |
+| Parameter | Type                            | Default                       | Description                                                      |
+|-----------|---------------------------------|-------------------------------|------------------------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'`                | Unique application name to separate data                         |
+| `level`   | `DebugLogLevel`                 | `'log'`                       | Minimum logging level (messages below this level are not output) |
+| `prop`    | `string` \| `null`              | `'info'`                      | Global variable name to access data (`null` — do not create)     |
+| `data`    | `Record<string, unknown>`       | —                             | Initial debug data                                               |
+| `local`   | `boolean`                       | `false`                       | Save level in `localStorage` (otherwise `sessionStorage`)        |
+| `native`  | `boolean`                       | `false`                       | Use native console methods (without styles)                      |
+| `aliases` | `Record<string, DebugLogLevel>` | '{}'                          | Custom aliases for `createDebug`                                 |
+| `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles-) | CSS styles for log levels                                        |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 ```
 
-### Default Styles 🎨
+### Default styles 🎨
 
 | Level     | Style (CSS)                                                                |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
-| `warn`    | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
-| `error`   | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
+| `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
+| `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
+| `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
-## How to Use 💡
+## How to use 💡
 
-### Initialization
+### Creating an instance
 
-Called once at the application entry point (`main.js` / `app.js`):
+```typescript
+// debug.ts
+import { DebugWeb } from 'debug-web';
 
-```javascript
-import { debugInit } from 'debug-web';
-
-debugInit({
-  level: isDev ? 'debug' : 'error',
-  data: { version: env.VERSION, buildTime: env.BUILD_TIMESTAMP }
+export const debug = new DebugWeb({
+  app: 'my-app',
+  level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
+  data: { version: APP_VERSION },
+  aliases: { s: 'success', f: 'focus' },
+  local: true,
 });
 ```
 
-### Logging
+### API 📚
 
-Use anywhere in the application to output messages:
+#### `createDebug` function
 
-```javascript
-import { debug, log, info, success, warn, error } from 'debug-web';
+Creates a proxy with aliases and custom level support.
 
-debug('Debug message');
-log('Regular message');
-info('Informational message');
-success('Success!');
-warn('Warning!');
-error(new Error());
+```typescript
+<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
 
-### Debug Data
+Default aliases: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
-Save debug data that will be accessible via a global variable:
+#### Logging methods
 
-```javascript
-import { debugData } from 'debug-web';
+| Level        | Type                                                                   |
+|--------------|------------------------------------------------------------------------|
+| `debug`      | `(message?: unknown, ...attrs: unknown[]) => void`                     |
+| `log`        | `(...attrs: unknown[]) => void`                                        |
+| `info`       | `(...attrs: unknown[]) => void`                                        |
+| `warn`       | `(...attrs: unknown[]) => void`                                        |
+| `error`      | `(...attrs: unknown[]) => void`                                        |
+| `group`      | `(open?: boolean, level?: DebugLogLevel, ...attrs: unknown[]) => void` |
+| `groupEnd`   | `(level?: DebugLogLevel) => void`                                      |
+| `dir`        | `(value: unknown, options?: unknown) => void`                          |
+| `dirxml`     | `(...attrs: unknown[]) => void`                                        |
+| `trace`      | `(...attrs: unknown[]) => void`                                        |
+| `table`      | `(data: unknown, properties?: string[]) => void`                       |
+| `count`      | `(label?: string) => void`                                             |
+| `countReset` | `(label?: string) => void`                                             |
+| `time`       | `(label?: string) => void`                                             |
+| `timeLog`    | `(label?: string, ...attrs: unknown[]) => void`                        |
+| `timeEnd`    | `(label?: string) => void`                                             |
 
-debugData({ lastError: null, prevRoute: '/home', bus: ['ui:modal-opened'] });
-```
+#### Data handling
 
-💡 Tip: In DevTools, type `info` (or another `prop` value) to get all saved data.
+| Method | Type                                              | Comment                                                              |
+|--------|---------------------------------------------------|----------------------------------------------------------------------|
+| `set`  | `(data: DebugWebData) => void`                    | Saves debug data (merges)                                            |
+| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Returns a copy of all data. If `true` is passed, adds helper methods |
+| `dump` | `(keys: string[], options?: DumpOptions) => void` | Outputs data as a table (ignores logging levels)                     |
 
-## Style Customization 🖌️
 
-```javascript
-import { debugSetStyle } from 'debug-web';
-
-// Change style for a specific level
-debugSetStyle('info', 'color: purple; font-weight: bold;');
-
-// Or change multiple levels at once
-debugSetStyle({ info: 'color: #9b59b6;', success: 'color: #27ae60;' });
-```
-
-## API 📚
-
-### Logging Methods
-
-All major `console` methods are supported:
-
-- `debug`, `log`, `info`, `warn`, `error`;
-- `group` (`groupCollapsed`), `groupEnd`;
-- `trace`, `count`, `countReset`;
-- `time`, `timeLog`, `timeEnd`;
-- `dir`, `dirxml`, `table`.
-
-### Helper Methods
-
-- `debugData` — Adding debug data (merged with existing);
-- `debugSetStyle` — Changing CSS styles for log levels;
-- `debugGetStyle` — Getting current style settings;
-- `debugReset`.
-
-## Extending Functionality
-
-You can create your own class to add custom logging methods:
-
-```ts
-export class CustomDebug extends WebDebug {
-  static {
-    // Add new style for custom level
-    CustomDebug.setStyle({ ...WebDebug._style, 'customEvent': 'color: #00ff00' });
-  }
-
-  // Create a new logging method
-  static customEvent(...attrs: unknown[]) {
-    // Check if 'info' level (to which custom levels are equated) is allowed
-    if (!CustomDebug.can('info')) return;
-
-    // Use internal method for formatting and output
-    CustomDebug.print('info', 'customEvent', attrs);
-  }
+```typescript
+type DumpOptions = {
+  level?: DebugLogLevel;
+  title?: string | ((data) => string);
+  open?: boolean;
 }
+```
+
+#### Level management
+
+| Method     | Type                                     | Comment                                             |
+|------------|------------------------------------------|-----------------------------------------------------|
+| `setLevel` | `(level: DebugLogLevel \| true) => void` | Sets the minimum level; `true` resets it to `'log'` |
+
+#### Styling
+
+| Method     | Type                                            | Comment                    |
+|------------|-------------------------------------------------|----------------------------|
+| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Sets the style for a level |
+| `setStyle` | `(styles: DebugWebStyle) => void`               | Sets multiple styles       |
+| `getStyle` | `() => DebugWebStyle`                           | Returns current styles     |
+
+### Debug data
+
+Save any data and view it in the console:
+
+```javascript
+debug.set({ error: null, user: { id: 1, name: 'John' } });
+```
+
+Data is accessible via `window[prop]` (default is `info`).
+Type into the browser console:
+
+```javascript
+  info // { error: null, user: {...}, setLevel: f }
+  info.setLevel() // change logging level
 ```
 
 ## Support ❤️
@@ -179,7 +190,7 @@ If you find this library useful, consider supporting its development:
 
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
-## Ссылки
+## Links
 - [📝 Changelog](CHANGELOG.md)
 - [💻 Source Code](https://github.com/Karlen-ll/debug-web)
 - [🐛 Bug Reports](https://github.com/Karlen-ll/debug-web/issues)

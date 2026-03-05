@@ -1,27 +1,32 @@
 # Debug Web
 
-Paquete NPM de utilidad de depuración para navegadores con niveles de registro configurables (log, warn, error, debug).\
+Paquete NPM para depuración en el navegador con niveles de registro personalizables (log, warn, error, debug).\
 Ligero y fácil de usar.
 
-**Ventajas**:
+**Características**:
 - 🚀 **Sin dependencias** — solo TypeScript puro;
-- 📦 **Peso ~3.0 kB** — impacto mínimo en el bundle;
-- 🏅 **Calificación `A` de SonarQube** — máxima calidad y fiabilidad del código;
-- 🎨 **Estilización de salida de consola** — formato coloreado para identificación rápida;
-- 💾 **Almacenamiento global** — accede a datos de depuración mediante `window`.
+- 📦 **Peso ~3.5 kB** — impacto mínimo en tu bundle;
+- 🏅 **Calificación SonarQube `A`** — el nivel más alto de calidad y confiabilidad de código;
+- 🎨 **Estilización de consola** — formato de colores para una identificación rápida;
+- 💾 **Almacenamiento global** — acceso a los datos de depuración a través de `window`;
+- 🔧 **Configuración flexible** — niveles de registro, estilos, alias, soporte para herencia.
 
 ---
 
-## Tabla de Contenidos 📑
+## Tabla de contenidos 📑
 
 - [Instalación](#instalación-)
-- [Niveles de Registro](#niveles-de-registro-)
+- [Niveles de registro](#niveles-de-registro-)
 - [Opciones](#opciones-)
-- [Estilos por Defecto](#estilos-por-defecto-)
-- [Cómo Usar](#cómo-usar-)
-- [Personalización de Estilos](#personalización-de-estilos-)
+- [Estilos por defecto](#estilos-por-defecto-)
 - [API](#api-)
-- [Extensión de Funcionalidad](#extensión-de-funcionalidad)
+  - [createDebug](#función-createdebug)
+  - [Métodos de registro](#métodos-de-registro)
+  - [Manejo de datos](#manejo-de-datos)
+  - [Gestión de niveles](#gestión-de-niveles)
+- [Datos de depuración](#datos-de-depuración)
+- [Soporte](#soporte-)
+- [Licencia](#licencia)
 
 ## Traducciones
 
@@ -38,7 +43,7 @@ npm install debug-web
 yarn add debug-web
 ```
 
-## Niveles de Registro 🔧
+## Niveles de registro 🔧
 
 Prioridad (de menor a mayor):
 
@@ -48,129 +53,136 @@ Prioridad (de menor a mayor):
 4. `warn` (3) —  advertencias (`console.warn`)
 5. `error` (4) — errores (`console.error`)
 
-ℹ️ Niveles personalizados: cualquier valor de cadena (incluyendo `success`) se tratará como nivel `info`.
+ℹ️ Niveles personalizados: cualquier valor de cadena (por ejemplo, `success`, `focus`) será procesado como nivel `info`
+y puede tener sus propios estilos.
 
 ## Opciones ⚙️
 
-| Parámetro | Tipo                            | Por Defecto                        | Descripción                                                               |
-|-----------|---------------------------------|------------------------------------|---------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'__debug_web__'`                  | Nombre único de la app para separar datos de diferentes aplicaciones      |
-| `level`   | `DebugLogLevel`                 | `'log'`                            | Nivel mínimo de registro (mensajes por debajo no se imprimen)             |
-| `prop`    | `string` \| `null`              | `'info'`                           | Nombre de la variable global para acceder a datos mediante `window[prop]` |
-| `data`    | `Record<string, unknown>`       | —                                  | Datos de depuración iniciales guardados tras la inicialización            |
-| `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto-) | Estilos CSS personalizados para mensajes de diferentes niveles            |
+| Parámetro | Tipo                            | Por defecto                        | Descripción                                                                 |
+|-----------|---------------------------------|------------------------------------|-----------------------------------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'`                     | Nombre único de la aplicación para separar datos                            |
+| `level`   | `DebugLogLevel`                 | `'log'`                            | Nivel mínimo de registro (no se muestran mensajes por debajo de este nivel) |
+| `prop`    | `string` \| `null`              | `'info'`                           | Nombre de variable global para acceder a datos (`null` — no crear)          |
+| `data`    | `Record<string, unknown>`       | —                                  | Datos iniciales de depuración                                               |
+| `local`   | `boolean`                       | `false`                            | Guardar el nivel en `localStorage` (de lo contrario en `sessionStorage`)    |
+| `native`  | `boolean`                       | `false`                            | Usar métodos nativos de la consola (sin estilos)                            |
+| `aliases` | `Record<string, DebugLogLevel>` | '{}'                               | Alias personalizados para `createDebug`                                     |
+| `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto-) | Estilos CSS para los niveles de registro                                    |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 ```
 
-### Estilos por Defecto 🎨
+### Estilos por defecto 🎨
 
 | Nivel     | Estilo (CSS)                                                               |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
-| `warn`    | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
-| `error`   | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
+| `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
+| `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
+| `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
-## Cómo Usar 💡
+## Cómo usar 💡
 
-### Inicialización
+### Crear una instancia
 
-Se llama una vez en el punto de entrada de la aplicación (`main.js` / `app.js`):
+```typescript
+// debug.ts
+import { DebugWeb } from 'debug-web';
 
-```javascript
-import { debugInit } from 'debug-web';
-
-debugInit({
-  level: isDev ? 'debug' : 'error',
-  data: { version: env.VERSION, buildTime: env.BUILD_TIMESTAMP }
+export const debug = new DebugWeb({
+  app: 'my-app',
+  level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
+  data: { version: APP_VERSION },
+  aliases: { s: 'success', f: 'focus' },
+  local: true,
 });
 ```
 
-### Registro
+### API 📚
 
-Usa en cualquier parte de la aplicación para mostrar mensajes:
+#### Función `createDebug`
 
-```javascript
-import { debug, log, info, success, warn, error } from 'debug-web';
+Crea un proxy con alias y soporte para niveles personalizados.
 
-debug('Mensaje de depuración');
-log('Mensaje regular');
-info('Mensaje informativo');
-success('¡Éxito!');
-warn('¡Advertencia!');
-error(new Error());
+```typescript
+<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
 
-### Datos de Depuración
+Alias por defecto: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
-Guarda datos de depuración que serán accesibles mediante una variable global:
+#### Métodos de registro
 
-```javascript
-import { debugData } from 'debug-web';
+| Nivel        | Tipo                                                                   |
+|--------------|------------------------------------------------------------------------|
+| `debug`      | `(message?: unknown, ...attrs: unknown[]) => void`                     |
+| `log`        | `(...attrs: unknown[]) => void`                                        |
+| `info`       | `(...attrs: unknown[]) => void`                                        |
+| `warn`       | `(...attrs: unknown[]) => void`                                        |
+| `error`      | `(...attrs: unknown[]) => void`                                        |
+| `group`      | `(open?: boolean, level?: DebugLogLevel, ...attrs: unknown[]) => void` |
+| `groupEnd`   | `(level?: DebugLogLevel) => void`                                      |
+| `dir`        | `(value: unknown, options?: unknown) => void`                          |
+| `dirxml`     | `(...attrs: unknown[]) => void`                                        |
+| `trace`      | `(...attrs: unknown[]) => void`                                        |
+| `table`      | `(data: unknown, properties?: string[]) => void`                       |
+| `count`      | `(label?: string) => void`                                             |
+| `countReset` | `(label?: string) => void`                                             |
+| `time`       | `(label?: string) => void`                                             |
+| `timeLog`    | `(label?: string, ...attrs: unknown[]) => void`                        |
+| `timeEnd`    | `(label?: string) => void`                                             |
 
-debugData({ lastError: null, prevRoute: '/home', bus: ['ui:modal-opened'] });
-```
+#### Manejo de datos
 
-💡 Consejo: En DevTools, escribe `info` (u otro valor de `prop`) para obtener todos los datos guardados.
+| Método | Tipo                                              | Comentario                                                                  |
+|--------|---------------------------------------------------|-----------------------------------------------------------------------------|
+| `set`  | `(data: DebugWebData) => void`                    | Guarda los datos de depuración (los fusiona)                                |
+| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Devuelve una copia de todos los datos. Si es `true`, añade métodos de ayuda |
+| `dump` | `(keys: string[], options?: DumpOptions) => void` | Imprime los datos en formato tabla (ignora niveles de registro)             |
 
-## Personalización de Estilos 🖌️
 
-```javascript
-import { debugSetStyle } from 'debug-web';
-
-// Cambiar estilo para un nivel específico
-debugSetStyle('info', 'color: purple; font-weight: bold;');
-
-// O cambiar varios niveles a la vez
-debugSetStyle({ info: 'color: #9b59b6;', success: 'color: #27ae60;' });
-```
-
-## API 📚
-
-### Métodos de Registro
-
-Se soportan todos los métodos principales de `console`:
-
-- `debug`, `log`, `info`, `warn`, `error`;
-- `group` (`groupCollapsed`), `groupEnd`;
-- `trace`, `count`, `countReset`;
-- `time`, `timeLog`, `timeEnd`;
-- `dir`, `dirxml`, `table`.
-
-### Métodos Auxiliares
-
-- `debugData` — Agregar datos de depuración (se fusiona con los existentes);
-- `debugSetStyle` — Cambiar estilos CSS para niveles de registro;
-- `debugGetStyle` — Obtener configuración actual de estilos;
-- `debugReset`.
-
-## Extensión de Funcionalidad
-
-Puedes crear tu propia clase para agregar métodos de registro personalizados:
-
-```ts
-export class CustomDebug extends WebDebug {
-  static {
-    // Agregar nuevo estilo para nivel personalizado
-    CustomDebug.setStyle({ ...WebDebug._style, 'customEvent': 'color: #00ff00' });
-  }
-
-  // Crear un nuevo método de registro
-  static customEvent(...attrs: unknown[]) {
-    // Verificar si el nivel 'info' (al que se equiparan niveles personalizados) está permitido
-    if (!CustomDebug.can('info')) return;
-
-    // Usar método interno para formatear y mostrar
-    CustomDebug.print('info', 'customEvent', attrs);
-  }
+```typescript
+type DumpOptions = {
+  level?: DebugLogLevel;
+  title?: string | ((data) => string);
+  open?: boolean;
 }
 ```
 
-## Apoyo ❤️
+#### Gestión de niveles
 
-Si encuentras útil esta librería, considera apoyar su desarrollo:
+| Método     | Tipo                                     | Comentario                                                |
+|------------|------------------------------------------|-----------------------------------------------------------|
+| `setLevel` | `(level: DebugLogLevel \| true) => void` | Establece el nivel mínimo; `true` lo restablece a `'log'` |
+
+#### Estilización
+
+| Método     | Tipo                                            | Comentario                        |
+|------------|-------------------------------------------------|-----------------------------------|
+| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Establece el estilo para un nivel |
+| `setStyle` | `(styles: DebugWebStyle) => void`               | Establece varios estilos          |
+| `getStyle` | `() => DebugWebStyle`                           | Devuelve los estilos actuales     |
+
+### Datos de depuración
+
+Guarde cualquier dato y véalo en la consola:
+
+```javascript
+debug.set({ error: null, user: { id: 1, name: 'John' } });
+```
+
+Los datos son accesibles a través de `window[prop]` (por defecto es `info`).
+Escriba en la consola del navegador:
+
+```javascript
+  info // { error: null, user: {...}, setLevel: f }
+  info.setLevel() // cambiar el nivel de registro
+```
+
+## Soporte ❤️
+
+Si esta biblioteca te resulta útil, considera apoyar su desarrollo:
 
 - [Patreon](https://www.patreon.com/collection/1924882)
 - [Boosty](https://boosty.to/karlen/donate)
@@ -180,7 +192,7 @@ Si encuentras útil esta librería, considera apoyar su desarrollo:
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Enlaces
-- [📝 Historial de Cambios](CHANGELOG.md)
-- [💻 Código Fuente](https://github.com/Karlen-ll/debug-web)
-- [🐛 Reportar Errores](https://github.com/Karlen-ll/debug-web/issues)
+- [📝 Historial de cambios](CHANGELOG.md)
+- [💻 Código fuente](https://github.com/Karlen-ll/debug-web)
+- [🐛 Reportes de errores](https://github.com/Karlen-ll/debug-web/issues)
 - [📦 Paquete NPM](https://www.npmjs.com/package/debug-web)

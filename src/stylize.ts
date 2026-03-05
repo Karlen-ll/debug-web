@@ -1,3 +1,5 @@
+import { isString } from '@/utils';
+
 /**
  * Style a message for console
  * @desc CSS-style format: `background-color: red; color: white`
@@ -9,10 +11,10 @@ export const stylizeMsg = (message: unknown, style: string): [string, string] =>
 
 /**
  * Style attributes for console
- * @desc Applies styling to the first attribute only
+ * @desc Applies styling to the first attribute only if it is a string
  */
-export const stylizeAttrs = (attrs: unknown[], styles?: string | null)=> {
-  if (!styles || !attrs?.length) {
+export const stylizeAttrs = (attrs: unknown[], styles?: string | null) => {
+  if (!styles || !attrs?.length || !isString(attrs[0])) {
     return attrs;
   }
 
@@ -21,12 +23,13 @@ export const stylizeAttrs = (attrs: unknown[], styles?: string | null)=> {
 
 /** Generate simple CSS styles */
 const getStyle = (bg: string, color = '#fff') => {
-  return `background-color: ${bg}; color: ${color}; padding: 2px; border-radius: 3px;`;
+  return `background: ${bg}; color: ${color}; padding: 2px; border-radius: 3px;`;
 };
 
 export const defaultStyle = {
   info: getStyle('#155adc'),
   success: getStyle('#13a10e'),
-  warn: getStyle('#ffa500'),
-  error: getStyle('#dc143c'),
+  focus: getStyle('#881798'),
+  alert: getStyle('#ffa500'),
+  danger: getStyle('#dc143c'),
 };

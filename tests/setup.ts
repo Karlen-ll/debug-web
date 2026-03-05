@@ -1,18 +1,6 @@
-import { vi, afterEach } from 'vitest';
+import { vi } from 'vitest';
+import { CONSOLE_METHODS } from './const';
 
-const consoleMethods = [
-  'debug', 'log', 'info', 'warn', 'error', 'dir', 'dirxml', 'count', 'countReset', 'table',
-  'group', 'groupCollapsed', 'groupEnd', 'time', 'timeLog', 'timeEnd', 'trace'
-] as const;
-
-consoleMethods.forEach(method => {
+CONSOLE_METHODS.forEach(method => {
   vi.spyOn(console, method).mockImplementation(() => {});
-});
-
-afterEach(() => {
-  consoleMethods.forEach(method => {
-    vi.mocked(console[method]).mockClear();
-  });
-
-  vi.clearAllMocks();
 });

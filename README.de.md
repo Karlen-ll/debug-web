@@ -1,27 +1,32 @@
 # Debug Web
 
-NPM-Paket als Browser-Debug-Hilfsprogramm mit konfigurierbaren Log-Levels (log, warn, error, debug).\
-Leichtgewichtig und einfach zu verwenden.
+NPM-Paket für das Debugging im Browser mit anpassbaren Protokollierungsebenen (log, warn, error, debug).\
+Leichtgewichtig und einfach zu bedienen.
 
-**Vorteile**:
-- 🚀 **Keine Abhängigkeiten** — nur reines TypeScript;
-- 📦 **Größe ~3.0 kB** — minimaler Einfluss auf das Bundle;
-- 🏅 **SonarQube `A`-Bewertung** — höchste Codequalität und Zuverlässigkeit;
-- 🎨 **Konsole-Ausgabe-Styling** — farbige Formatierung für schnelle Identifizierung;
-- 💾 **Globale Speicherung** — Zugriff auf Debug-Daten über `window`.
+**Eigenschaften**:
+- 🚀 **Keine Abhängigkeiten** — reines TypeScript;
+- 📦 **Größe ~3.5 kB** — minimaler Einfluss auf Ihr Bundle;
+- 🏅 **SonarQube `A` Bewertung** — höchstes Maß an Codequalität und Zuverlässigkeit;
+- 🎨 **Konsolen-Styling** — farbliche Formatierung zur schnellen Identifikation;
+- 💾 **Globaler Speicher** — Zugriff auf Debug-Daten über `window`;
+- 🔧 **Flexible Konfiguration** — Protokollierungsebenen, Stile, Aliase, Unterstützung von Vererbung.
 
 ---
 
 ## Inhaltsverzeichnis 📑
 
 - [Installation](#installation-)
-- [Log-Level](#log-level-)
+- [Protokollierungsebenen](#protokollierungsebenen-)
 - [Optionen](#optionen-)
 - [Standardstile](#standardstile-)
-- [Verwendung](#verwendung-)
-- [Stilanpassung](#stilanpassung-)
 - [API](#api-)
-- [Erweiterung der Funktionalität](#erweiterung-der-funktionalität)
+  - [createDebug](#funktion-createdebug)
+  - [Protokollierungsmethoden](#protokollierungsmethoden)
+  - [Datenverarbeitung](#datenverarbeitung)
+  - [Ebenenverwaltung](#ebenenverwaltung)
+- [Debug-Daten](#debug-daten)
+- [Unterstützung](#unterstützung-)
+- [Lizenz](#lizenz)
 
 ## Übersetzungen
 
@@ -38,7 +43,7 @@ npm install debug-web
 yarn add debug-web
 ```
 
-## Log-Level 🔧
+## Protokollierungsebenen 🔧
 
 Priorität (niedrig nach hoch):
 
@@ -48,17 +53,21 @@ Priorität (niedrig nach hoch):
 4. `warn` (3) —  Warnungen (`console.warn`);
 5. `error` (4) — Fehler (`console.error`).
 
-ℹ️ Benutzerdefinierte Level: Jeder Zeichenkettenwert (einschließlich `success`) wird als `info`-Level behandelt.
+ℹ️ Benutzerdefinierte Ebenen: beliebige Zeichenfolgen (z.B. `success`, `focus`) werden als `info`-Ebene verarbeitet
+und können eigene Stile haben.
 
 ## Optionen ⚙️
 
-| Parameter | Typ                             | Standardwert                   | Beschreibung                                                             |
-|-----------|---------------------------------|--------------------------------|--------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'__debug_web__'`              | Eindeutiger App-Name zur Trennung von Daten verschiedener Anwendungen    |
-| `level`   | `DebugLogLevel`                 | `'log'`                        | Minimales Log-Level (Nachrichten darunter werden nicht ausgegeben)       |
-| `prop`    | `string` \| `null`              | `'info'`                       | NName der globalen Variable für Datenzugriff über `window[prop]`         |
-| `data`    | `Record<string, unknown>`       | —                              | Initiale Debug-Daten, die sofort nach Initialisierung gespeichert werden |
-| `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile-) | Benutzerdefinierte CSS-Stile für Nachrichten verschiedener Level         |
+| Parameter | Typ                             | Standard                       | Beschreibung                                                                 |
+|-----------|---------------------------------|--------------------------------|------------------------------------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'`                 | Eindeutiger App-Name zur Trennung von Daten                                  |
+| `level`   | `DebugLogLevel`                 | `'log'`                        | Minimale Protokollierungsebene (Nachrichten darunter werden nicht angezeigt) |
+| `prop`    | `string` \| `null`              | `'info'`                       | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
+| `data`    | `Record<string, unknown>`       | —                              | Initiale Debug-Daten                                                         |
+| `local`   | `boolean`                       | `false`                        | Ebene in `localStorage` speichern (sonst `sessionStorage`)                   |
+| `native`  | `boolean`                       | `false`                        | Native Konsolenmethoden (ohne Stile) verwenden                               |
+| `aliases` | `Record<string, DebugLogLevel>` | '{}'                           | Benutzerdefinierte Aliase für `createDebug`                                  |
+| `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile-) | CSS-Stile für die Protokollierungsebenen                                     |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
@@ -66,110 +75,114 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 
 ### Standardstile 🎨
 
-| Level     | Stil (CSS)                                                                 |
+| Ebene     | Stil (CSS)                                                                 |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
-| `warn`    | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
-| `error`   | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
+| `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
+| `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
+| `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
 ## Verwendung 💡
 
-### Initialisierung
+### Erstellen einer Instanz
 
-Einmalig am Einstiegspunkt der Anwendung aufrufen (`main.js` / `app.js`):
+```typescript
+// debug.ts
+import { DebugWeb } from 'debug-web';
 
-```javascript
-import { debugInit } from 'debug-web';
-
-debugInit({
-  level: isDev ? 'debug' : 'error',
-  data: { version: env.VERSION, buildTime: env.BUILD_TIMESTAMP }
+export const debug = new DebugWeb({
+  app: 'my-app',
+  level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
+  data: { version: APP_VERSION },
+  aliases: { s: 'success', f: 'focus' },
+  local: true,
 });
 ```
 
-### Protokollierung
+### API 📚
 
-Überall in der Anwendung verwenden, um Nachrichten auszugeben:
+#### Funktion `createDebug`
 
-```javascript
-import { debug, log, info, success, warn, error } from 'debug-web';
+Erstellt einen Proxy mit Aliasen und Unterstützung für benutzerdefinierte Ebenen.
 
-debug('Debug-Nachricht');
-log('Reguläre Nachricht');
-info('Informationelle Nachricht');
-success('Erfolg!');
-warn('Warnung!');
-error(new Error());
+```typescript
+<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
+
+Standard-Aliase: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
+#### Protokollierungsmethoden
+
+| Ebene        | Typ                                                                    |
+|--------------|------------------------------------------------------------------------|
+| `debug`      | `(message?: unknown, ...attrs: unknown[]) => void`                     |
+| `log`        | `(...attrs: unknown[]) => void`                                        |
+| `info`       | `(...attrs: unknown[]) => void`                                        |
+| `warn`       | `(...attrs: unknown[]) => void`                                        |
+| `error`      | `(...attrs: unknown[]) => void`                                        |
+| `group`      | `(open?: boolean, level?: DebugLogLevel, ...attrs: unknown[]) => void` |
+| `groupEnd`   | `(level?: DebugLogLevel) => void`                                      |
+| `dir`        | `(value: unknown, options?: unknown) => void`                          |
+| `dirxml`     | `(...attrs: unknown[]) => void`                                        |
+| `trace`      | `(...attrs: unknown[]) => void`                                        |
+| `table`      | `(data: unknown, properties?: string[]) => void`                       |
+| `count`      | `(label?: string) => void`                                             |
+| `countReset` | `(label?: string) => void`                                             |
+| `time`       | `(label?: string) => void`                                             |
+| `timeLog`    | `(label?: string, ...attrs: unknown[]) => void`                        |
+| `timeEnd`    | `(label?: string) => void`                                             |
+
+#### Datenverarbeitung
+
+| Methode | Typ                                               | Kommentar                                                                       |
+|---------|---------------------------------------------------|---------------------------------------------------------------------------------|
+| `set`   | `(data: DebugWebData) => void`                    | Speichert Debug-Daten (zusammenführen)                                          |
+| `get`   | `(api?: boolean) => DebugWebData  \| undefined`   | Gibt eine Kopie aller Daten zurück. Bei `true` werden Hilfsmethoden hinzugefügt |
+| `dump`  | `(keys: string[], options?: DumpOptions) => void` | Gibt Daten als Tabelle aus (ignoriert Protokollierungsebenen)                   |
+
+
+```typescript
+type DumpOptions = {
+  level?: DebugLogLevel;
+  title?: string | ((data) => string);
+  open?: boolean;
+}
+```
+
+#### Ebenenverwaltung
+
+| Methode    | Typ                                      | Kommentar                                                 |
+|------------|------------------------------------------|-----------------------------------------------------------|
+| `setLevel` | `(level: DebugLogLevel \| true) => void` | Legt das Minimum fest; `true` setzt es auf `'log'` zurück |
+
+#### Styling
+
+| Methode    | Typ                                             | Kommentar                         |
+|------------|-------------------------------------------------|-----------------------------------|
+| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Legt den Stil für eine Ebene fest |
+| `setStyle` | `(styles: DebugWebStyle) => void`               | Legt mehrere Stile fest           |
+| `getStyle` | `() => DebugWebStyle`                           | Gibt aktuelle Stile zurück        |
 
 ### Debug-Daten
 
-Debug-Daten speichern, die über eine globale Variable zugänglich sind:
+Speichern Sie beliebige Daten und betrachten Sie sie in der Konsole:
 
 ```javascript
-import { debugData } from 'debug-web';
-
-debugData({ lastError: null, prevRoute: '/home', bus: ['ui:modal-opened'] });
+debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
-💡 Tipp: Gib in DevTools `info` (oder einen anderen `prop`-Wert) ein, um alle gespeicherten Daten zu erhalten.
 
-## Stilanpassung 🖌️
+Daten sind über `window[prop]` (Standard ist `info`) zugänglich.
+Geben Sie in der Browserkonsole ein:
 
 ```javascript
-import { debugSetStyle } from 'debug-web';
-
-// Stil für bestimmtes Level ändern
-debugSetStyle('info', 'color: purple; font-weight: bold;');
-
-// Oder mehrere Level gleichzeitig ändern
-debugSetStyle({ info: 'color: #9b59b6;', success: 'color: #27ae60;' });
-```
-
-## API 📚
-
-### Protokollierungsmethoden
-
-Alle wichtigen `console`-Methoden werden unterstützt:
-
-- `debug`, `log`, `info`, `warn`, `error`;
-- `group` (`groupCollapsed`), `groupEnd`;
-- `trace`, `count`, `countReset`;
-- `time`, `timeLog`, `timeEnd`;
-- `dir`, `dirxml`, `table`.
-
-### Hilfsmethoden
-
-- `debugData` — Hinzufügen von Debug-Daten (mit vorhandenen zusammengeführt);
-- `debugSetStyle` — Ändern von CSS-Stilen für Log-Level;
-- `debugGetStyle` — Abrufen aktueller Stileinstellungen;
-- `debugReset`.
-
-## Erweiterung der Funktionalität
-
-Sie können eine eigene Klasse erstellen, um benutzerdefinierte Protokollierungsmethoden hinzuzufügen:
-
-```ts
-export class CustomDebug extends WebDebug {
-  static {
-    // Neuen Stil für benutzerdefiniertes Level hinzufügen
-    CustomDebug.setStyle({ ...WebDebug._style, 'customEvent': 'color: #00ff00' });
-  }
-
-  // Neue Protokollierungsmethode erstellen
-  static customEvent(...attrs: unknown[]) {
-    // Prüfen, ob 'info'-Level (dem benutzerdefinierte Level gleichgesetzt werden) erlaubt ist
-    if (!CustomDebug.can('info')) return;
-
-    // Interne Methode für Formatierung und Ausgabe verwenden
-    CustomDebug.print('info', 'customEvent', attrs);
-  }
-}
+  info // { error: null, user: {...}, setLevel: f }
+  info.setLevel() // Protokollierungsebene ändern
 ```
 
 ## Unterstützung ❤️
 
-Wenn Sie diese Bibliothek nützlich finden, erwägen Sie eine Unterstützung der Entwicklung:
+Wenn diese Bibliothek für Sie nützlich ist, ziehen Sie bitte in Betracht, ihre Entwicklung zu unterstützen:
 
 - [Patreon](https://www.patreon.com/collection/1924882)
 - [Boosty](https://boosty.to/karlen/donate)

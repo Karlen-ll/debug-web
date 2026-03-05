@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DebugWeb</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<h1 class="header">DebugWeb</h1>
+
+<div class="container">
+  <div class="section">
+    <h2 class="title">Controls</h2>
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.set({ time: new Date().toISOString() })">Update</button>
+      <button class="button" onclick="debugWeb.setLevel('debug')">⚙️ Debug level</button>
+      <button class="button" onclick="debugWeb.setLevel('error')">⚙️ Error level</button>
+      <button class="button" onclick="logs()">ℹ️ Logs</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="title">Console Methods</h2>
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.debug('Debug')">debug</button>
+      <button class="button" onclick="debugWeb.log('Log')">log</button>
+      <button class="button" onclick="debugWeb.info('Info')">info</button>
+      <button class="button" onclick="debugWeb.warn('Warn')">warn</button>
+      <button class="button" onclick="debugWeb.error('Error')">error</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.success('Success')">success</button>
+      <button class="button" onclick="debugWeb.alert('Alert')">alert</button>
+      <button class="button" onclick="debugWeb.danger('Danger')">danger</button>
+      <button class="button" onclick="debugWeb.custom('Custom')">custom</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.group(true, 'log', 'Group opened')">group</button>
+      <button class="button" onclick="debugWeb.group(false, 'log', 'Collapsed group')">groupCollapsed</button>
+      <button class="button" onclick="debugWeb.groupEnd()">groupEnd</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.dir({ name: 'test', value: 123 })">dir</button>
+      <button class="button" onclick="debugWeb.table([{ id:1, name:'John' }, { id:2, name:'Jane' }])">table</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.count('counter')">count</button>
+      <button class="button" onclick="debugWeb.countReset('counter')">countReset</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.time('timer')">time</button>
+      <button class="button" onclick="debugWeb.timeLog('timer')">timeLog</button>
+      <button class="button" onclick="debugWeb.timeEnd('timer')">timeEnd</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="debugWeb.trace('Trace ℹ️')">trace</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>

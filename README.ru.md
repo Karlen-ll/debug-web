@@ -5,10 +5,11 @@ NPM-пакет для отладки в браузере с настраивае
 
 **Преимущества**:
 - 🚀 **Нет зависимостей** — только чистый TypeScript;
-- 📦 **Вес ~3.0 kB** — минимальное влияние на бандл;
+- 📦 **Вес ~3.5 kB** — минимальное влияние на бандл;
 - 🏅 **Рейтинг SonarQube `A`** — высший уровень качества кода и надёжности;
 - 🎨 **Стилизация console-выводов** — цветное форматирование для быстрой идентификации;
-- 💾 **Глобальное хранилище** — доступ к отладочным данным через `window`.
+- 💾 **Глобальное хранилище** — доступ к отладочным данным через `window`;
+- 🔧 **Гибкая настройка** — уровни логирования, стили, алиасы, возможность наследования.
 
 ---
 
@@ -18,10 +19,14 @@ NPM-пакет для отладки в браузере с настраивае
 - [Уровни логирования](#уровни-логирования-)
 - [Опции](#опции-)
 - [Стили по умолчанию](#стили-по-умолчанию-)
-- [Как использовать](#как-использовать-)
-- [Кастомизация стилей](#кастомизация-стилей-)
 - [API](#api-)
-- [Расширение функциональности](#расширение-функциональности)
+  - [createDebug](#функция-createdebug)
+  - [Методы логирования](#методы-логирования)
+  - [Работа с данными](#работа-с-данными)
+  - [Управление уровнем](#управление-уровнем)
+- [Отладочные данные](#отладочные-данные)
+- [Поддержка](#поддержка-)
+- [Лицензия](#лицензия)
 
 ## Переводы
 
@@ -48,17 +53,21 @@ yarn add debug-web
 4. `warn` (3) — предупреждения (`console.warn`)
 5. `error` (4) — ошибки (`console.error`)
 
-ℹ️ Кастомные уровни: любые строковые значения (включая `success`) будут обработаны как уровень `info`.
+ℹ️ Кастомные уровни: любые строковые значения (например, `success`, `focus`) будут обработаны как уровень `info`
+и могут иметь собственные стили.
 
 ## Опции ⚙️
 
-| Параметр | Тип                             | По умолчанию                     | Описание                                                                   |
-|----------|---------------------------------|----------------------------------|----------------------------------------------------------------------------|
-| `app`    | `string` \| `null`              | `'__debug_web__'`                | Уникальное имя приложения для разделения данных разных приложений          |
-| `level`  | `DebugLogLevel`                 | `'log'`                          | Минимальный уровень логирования (сообщения ниже этого уровня не выводятся) |
-| `prop`   | `string` \| `null`              | `'info'`                         | Имя глобальной переменной для доступа к данным через `window[prop]`        |
-| `data`   | `Record<string, unknown>`       | —                                | Начальные отладочные данные, сохраняемые сразу после инициализации         |
-| `style`  | `Record<DebugLogLevel, string>` | см. [ниже](#стили-по-умолчанию-) | Кастомизация CSS-стилей для сообщений разных уровней                       |
+| Параметр  | Тип                             | По умолчанию                     | Описание                                                                   |
+|-----------|---------------------------------|----------------------------------|----------------------------------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'`                   | Уникальное имя приложения для разделения данных                            |
+| `level`   | `DebugLogLevel`                 | `'log'`                          | Минимальный уровень логирования (сообщения ниже этого уровня не выводятся) |
+| `prop`    | `string` \| `null`              | `'info'`                         | Имя глобальной переменной для доступа к данным (`null` — не создавать)     |
+| `data`    | `Record<string, unknown>`       | —                                | Начальные отладочные данные                                                |
+| `local`   | `boolean`                       | `false`                          | Сохранять уровень в `localStorage` (иначе `sessionStorage`)                |
+| `native`  | `boolean`                       | `false`                          | Использовать нативные методы консоли (без стилей)                          |
+| `aliases` | `Record<string, DebugLogLevel>` | '{}'                             | Пользовательские алиасы для `createDebug`                                  |
+| `style`   | `Record<DebugLogLevel, string>` | см. [ниже](#стили-по-умолчанию-) | CSS-стили для уровлей логирования                                          |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
@@ -70,102 +79,105 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
-| `warn`    | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
-| `error`   | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
+| `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
+| `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
+| `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
 ## Как использовать 💡
 
-### Инициализация
+### Создание экземпляра
 
-Вызывается один раз в точке входа приложения (`main.js` / `app.js`):
+```typescript
+// debug.ts
+import { DebugWeb } from 'debug-web';
 
-```javascript
-import { debugInit } from 'debug-web';
-
-debugInit({
-  level: isDev ? 'debug' : 'error',
-  data: { version: env.VERSION, buildTime: env.BUILD_TIMESTAMP }
+export const debug = new DebugWeb({
+  app: 'my-app',
+  level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
+  data: { version: APP_VERSION },
+  aliases: { s: 'success', f: 'focus' },
+  local: true,
 });
 ```
 
-### Логирование
+### API 📚
 
-Используйте в любом месте приложения для вывода сообщений:
+#### Функция `createDebug`
 
-```javascript
-import { debug, log, info, success, warn, error } from 'debug-web';
+Создаёт прокси с алиасами и поддержкой кастомных уровней.
 
-debug('Отладочное сообщение');
-log('Обычное сообщение');
-info('Информационное сообщение');
-success('Успешно!');
-warn('Внимание!');
-error(new Error());
+```typescript
+<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
+
+Алиасы по умолчанию: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
+#### Методы логирования
+
+| Уровень      | Тип                                                                    |
+|--------------|------------------------------------------------------------------------|
+| `debug`      | `(message?: unknown, ...attrs: unknown[]) => void`                     |
+| `log`        | `(...attrs: unknown[]) => void`                                        |
+| `info`       | `(...attrs: unknown[]) => void`                                        |
+| `warn`       | `(...attrs: unknown[]) => void`                                        |
+| `error`      | `(...attrs: unknown[]) => void`                                        |
+| `group`      | `(open?: boolean, level?: DebugLogLevel, ...attrs: unknown[]) => void` |
+| `groupEnd`   | `(level?: DebugLogLevel) => void`                                      |
+| `dir`        | `(value: unknown, options?: unknown) => void`                          |
+| `dirxml`     | `(...attrs: unknown[]) => void`                                        |
+| `trace`      | `(...attrs: unknown[]) => void`                                        |
+| `table`      | `(data: unknown, properties?: string[]) => void`                       |
+| `count`      | `(label?: string) => void`                                             |
+| `countReset` | `(label?: string) => void`                                             |
+| `time`       | `(label?: string) => void`                                             |
+| `timeLog`    | `(label?: string, ...attrs: unknown[]) => void`                        |
+| `timeEnd`    | `(label?: string) => void`                                             |
+
+#### Работа с данными
+
+| Метод  | Тип                                               | Комментарий                                                                           |
+|--------|---------------------------------------------------|---------------------------------------------------------------------------------------|
+| `set`  | `(data: DebugWebData) => void`                    | Сохраняет отладочные данные (объединяет)                                              |
+| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Возвращает копию всех данных. Если передать `true` — добавляет вспомогательные методы |
+| `dump` | `(keys: string[], options?: DumpOptions) => void` | Выводит данные в виде таблицы (игнорирует уровни логирования)                         |
+
+
+```typescript
+type DumpOptions = {
+  level?: DebugLogLevel;
+  title?: string | ((data) => string);
+  open?: boolean;
+}
+```
+
+#### Управление уровнем
+
+| Метод      | Тип                                      | Комментарий                                                     |
+|------------|------------------------------------------|-----------------------------------------------------------------|
+| `setLevel` | `(level: DebugLogLevel \| true) => void` | Устанавливает минимальный уровень; `true` сбрасывает на `'log'` |
+
+#### Стилизация
+
+| Метод      | Тип                                             | Комментарий                    |
+|------------|-------------------------------------------------|--------------------------------|
+| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Устанавливает стиль для уровня |
+| `setStyle` | `(styles: DebugWebStyle) => void`               | Устанавливает несколько стилей |
+| `getStyle` | `() => DebugWebStyle`                           | Возвращает текущие стили       |
 
 ### Отладочные данные
 
-Сохраняйте данные для отладки, которые будут доступны через глобальную переменную:
+Сохраняйте любые данные и просматривайте их в консоли:
 
 ```javascript
-import { debugData } from 'debug-web';
-
-debugData({ lastError: null, prevRoute: '/home', bus: ['ui:modal-opened'] });
+debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-💡 Совет: В DevTools введите `info` (или другое значение `prop`) чтобы получить все сохранённые данные.
-
-## Кастомизация стилей 🖌️
+Данные доступны через `window[prop]` (по умолчанию `info`).\
+Введите в консоль браузера:
 
 ```javascript
-import { debugSetStyle } from 'debug-web';
-
-// Изменить стиль для конкретного уровня
-debugSetStyle('info', 'color: purple; font-weight: bold;');
-
-// Или изменить несколько уровней сразу
-debugSetStyle({ info: 'color: #9b59b6;', success: 'color: #27ae60;' });
-```
-
-## API 📚
-
-### Методы логирования
-
-Поддерживаются все основные методы `console`:
-
-- `debug`, `log`, `info`, `warn`, `error`;
-- `group` (`groupCollapsed`), `groupEnd`;
-- `trace`, `count`, `countReset`;
-- `time`, `timeLog`, `timeEnd`;
-- `dir`, `dirxml`, `table`.
-
-### Вспомогательные методы
-
-- `debugData` — Добавление отладочных данных (объединяется с существующими);
-- `debugSetStyle` — Изменение CSS-стилей для уровней логирования;
-- `debugGetStyle` — Получение текущих настроек стилей;
-- `debugReset`.
-
-## Расширение функциональности
-
-Вы можете создать собственный класс для добавления кастомных методов логирования:
-
-```ts
-export class CustomDebug extends WebDebug {
-  static {
-    // Добавляем новый стиль для кастомного уровня
-    CustomDebug.setStyle({ ...WebDebug._style, 'customEvent': 'color: #00ff00' });
-  }
-
-  // Создаём новый метод логирования
-  static customEvent(...attrs: unknown[]) {
-    // Проверяем, разрешён ли уровень 'info' (к которому приравниваются кастомные уровни)
-    if (!CustomDebug.can('info')) return;
-
-    // Используем внутренний метод для форматирования и вывода
-    CustomDebug.print('info', 'customEvent', attrs);
-  }
-}
+  info // { error: null, user: {...}, setLevel: f }
+  info.setLevel() // изменить уровень логирования
 ```
 
 ## Поддержка ❤️
