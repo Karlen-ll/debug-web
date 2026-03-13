@@ -1,6 +1,9 @@
 /** Checks if code is running on server-side (SSR) */
 export const isSSR = (): boolean => typeof window === 'undefined';
 
+/** Checks that the value is defined */
+export const isDefined = <T>(value: T | undefined): value is T => typeof value !== 'undefined';
+
 /** Checks that the value is a string */
 export const isString = (value: unknown): value is string => typeof value === 'string';
 

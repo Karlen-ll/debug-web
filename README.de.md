@@ -5,7 +5,7 @@ Leichtgewichtig und einfach zu bedienen.
 
 **Eigenschaften**:
 - 🚀 **Keine Abhängigkeiten** — reines TypeScript;
-- 📦 **Größe ~3.5 kB** — minimaler Einfluss auf Ihr Bundle;
+- 📦 **Größe ~3.4 kB** — minimaler Einfluss auf Ihr Bundle;
 - 🏅 **SonarQube `A` Bewertung** — höchstes Maß an Codequalität und Zuverlässigkeit;
 - 🎨 **Konsolen-Styling** — farbliche Formatierung zur schnellen Identifikation;
 - 💾 **Globaler Speicher** — Zugriff auf Debug-Daten über `window`;
@@ -78,6 +78,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | Ebene     | Stil (CSS)                                                                 |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
+| `mark`    | `background-color: #695aff; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
 | `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
@@ -143,26 +144,32 @@ Standard-Aliase: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`,
 
 
 ```typescript
+type DebugWebData = Record<string, unknown>
+
 type DumpOptions = {
   level?: DebugLogLevel;
-  title?: string | ((data) => string);
+  title?: string | ((data: DebugWebData) => string);
   open?: boolean;
 }
 ```
 
 #### Ebenenverwaltung
 
-| Methode    | Typ                                      | Kommentar                                                 |
-|------------|------------------------------------------|-----------------------------------------------------------|
-| `setLevel` | `(level: DebugLogLevel \| true) => void` | Legt das Minimum fest; `true` setzt es auf `'log'` zurück |
+| Methode          | Typ             | Kommentar                                |
+|------------------|-----------------|------------------------------------------|
+| `level` (getter) | `DebugLogLevel` | Aktuelle Protokollierungsebene abrufen   |
+| `level` (setter) | `DebugLogLevel` | Aktuelle Protokollierungsebene festlegen |
 
 #### Styling
 
-| Methode    | Typ                                             | Kommentar                         |
-|------------|-------------------------------------------------|-----------------------------------|
-| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Legt den Stil für eine Ebene fest |
-| `setStyle` | `(styles: DebugWebStyle) => void`               | Legt mehrere Stile fest           |
-| `getStyle` | `() => DebugWebStyle`                           | Gibt aktuelle Stile zurück        |
+| Methode          | Typ                               | Kommentar                                          |
+|------------------|-----------------------------------|----------------------------------------------------|
+| `style` (getter) | `() => DebugWebStyle`             | Aktuelle Stilzuordnung abrufen                     |
+| `style` (setter) | `(styles: DebugWebStyle) => void` | Stilzuordnung aktualisieren (wird zusammengeführt) |
+
+```typescript
+type DebugWebStyle = Record<DebugLogLevel, string | undefined>
+```
 
 ### Debug-Daten
 

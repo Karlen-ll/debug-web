@@ -5,7 +5,7 @@ NPM-пакет для отладки в браузере с настраивае
 
 **Преимущества**:
 - 🚀 **Нет зависимостей** — только чистый TypeScript;
-- 📦 **Вес ~3.5 kB** — минимальное влияние на бандл;
+- 📦 **Вес ~3.4 kB** — минимальное влияние на бандл;
 - 🏅 **Рейтинг SonarQube `A`** — высший уровень качества кода и надёжности;
 - 🎨 **Стилизация console-выводов** — цветное форматирование для быстрой идентификации;
 - 💾 **Глобальное хранилище** — доступ к отладочным данным через `window`;
@@ -78,6 +78,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | Уровень   | Стиль (CSS)                                                                |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
+| `mark`    | `background-color: #695aff; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
 | `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
@@ -143,26 +144,32 @@ export const debug = new DebugWeb({
 
 
 ```typescript
+type DebugWebData = Record<string, unknown>
+
 type DumpOptions = {
   level?: DebugLogLevel;
-  title?: string | ((data) => string);
+  title?: string | ((data: DebugWebData) => string);
   open?: boolean;
 }
 ```
 
 #### Управление уровнем
 
-| Метод      | Тип                                      | Комментарий                                                     |
-|------------|------------------------------------------|-----------------------------------------------------------------|
-| `setLevel` | `(level: DebugLogLevel \| true) => void` | Устанавливает минимальный уровень; `true` сбрасывает на `'log'` |
+| Метод            | Тип             | Комментарий                          |
+|------------------|-----------------|--------------------------------------|
+| `level` (getter) | `DebugLogLevel` | Получить текущий уровень логирвоания |
+| `level` (setter) | `DebugLogLevel` | Задать уровень логирвоания           |
 
 #### Стилизация
 
-| Метод      | Тип                                             | Комментарий                    |
-|------------|-------------------------------------------------|--------------------------------|
-| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Устанавливает стиль для уровня |
-| `setStyle` | `(styles: DebugWebStyle) => void`               | Устанавливает несколько стилей |
-| `getStyle` | `() => DebugWebStyle`                           | Возвращает текущие стили       |
+| Метод            | Тип                               | Комментарий                              |
+|------------------|-----------------------------------|------------------------------------------|
+| `style` (getter) | `() => DebugWebStyle`             | Получить карту стилей                    |
+| `style` (setter) | `(styles: DebugWebStyle) => void` | Обновить карту стилей (будет объединена) |
+
+```typescript
+type DebugWebStyle = Record<DebugLogLevel, string | undefined>
+```
 
 ### Отладочные данные
 

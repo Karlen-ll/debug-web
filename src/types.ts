@@ -1,7 +1,7 @@
 export type DebugWebLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 
 export type DebugWebData = Record<string, unknown>
-export type DebugWebStyle = Partial<Record<DebugWebLogLevel, string | null>>
+export type DebugWebStyle = Partial<Record<DebugWebLogLevel, string | undefined>>
 
 export interface DebugWebOptions {
   /** Unique application name

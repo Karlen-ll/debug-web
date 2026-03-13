@@ -1,20 +1,19 @@
 import { describe, it, vi, expect, beforeEach, afterEach } from 'vitest';
 import { TestDebugWeb } from '../utils';
 import { createDebug } from '@/createDebug';
-import { getWindowKey } from '@/utils';
-import { defaultStyle } from '@/stylize';
 import {
+  TEST_STYLES,
   TEST_MESSAGE,
-  STYLES_OBJECT,
-  STYLES_STRING,
+  COMPLETE_DATA,
   DATA_FRAGMENT_1,
   DATA_FRAGMENT_2,
-  COMPLETE_DATA,
-  TEST_APP_NAME,
-  TEST_PROP_NAME,
   DEFAULT_APP_NAME,
   DEFAULT_PROP_NAME,
+  TEST_RAW_APP_NAME,
+  TEST_APP_NAME,
+  TEST_PROP_NAME,
 } from '../const';
+import { DEFAULT_STYLE } from '@/const';
 import type { DebugWebOptions } from '@/types';
 
 describe('DebugWeb', () => {
@@ -44,12 +43,17 @@ describe('DebugWeb', () => {
 
     describe('log levels when disabled', () => {
       beforeEach(() => {
-        reset({ level: 'error' });
+        reset({ level: 'error', data: COMPLETE_DATA });
       });
 
       it.each(methods)('$method is not called when level is error', ({ level, method }) => {
         debug[level](TEST_MESSAGE);
         expect(console[method]).not.toHaveBeenCalled();
+      });
+
+      it('displays data table in console (ignores log level)', () => {
+        debug.dump(['version'], { title: 'Test', level: 'info' });
+        expect(console.table).toHaveBeenCalled();
       });
     });
 
@@ -167,12 +171,12 @@ describe('DebugWeb', () => {
   describe('storage', () => {
     it('uses default app name for data storage', () => {
       reset({ data: DATA_FRAGMENT_1 });
-      expect(window[getWindowKey(DEFAULT_APP_NAME)]).toEqual(DATA_FRAGMENT_1);
+      expect(window[DEFAULT_APP_NAME]).toEqual(DATA_FRAGMENT_1);
     });
 
     it('uses custom app name for data storage', () => {
-      reset({ data: DATA_FRAGMENT_1, app: TEST_APP_NAME });
-      expect(window[getWindowKey(TEST_APP_NAME)]).toEqual(DATA_FRAGMENT_1);
+      reset({ data: DATA_FRAGMENT_1, app: TEST_RAW_APP_NAME });
+      expect(window[TEST_APP_NAME]).toEqual(DATA_FRAGMENT_1);
     });
   });
 
@@ -211,18 +215,24 @@ describe('DebugWeb', () => {
   });
 
   describe('styles', () => {
-    beforeEach(() => {
+    it('updates styles', () => {
       reset();
+      debug.style = TEST_STYLES;
+      expect(debug.style).toEqual({ ...DEFAULT_STYLE, ...TEST_STYLES });
+    });
+  });
+
+  describe('level', () => {
+    it('updates log level', () => {
+      reset({ level: 'error' });
+      debug.level = 'log';
+      expect(debug.level).toEqual('log');
     });
 
-    it('updates styles for a single log level', () => {
-      debug.setStyle('error', STYLES_STRING);
-      expect(debug.getStyle()).toEqual({ ...defaultStyle, error: STYLES_STRING });
-    });
-
-    it('replaces all styles completely with new styles object', () => {
-      debug.setStyle(STYLES_OBJECT);
-      expect(debug.getStyle()).toEqual(STYLES_OBJECT);
+    it('saves level to storage', () => {
+      reset({ level: 'log' });
+      debug.level ='error';
+      expect(debug.level).toEqual('error');
     });
   });
 

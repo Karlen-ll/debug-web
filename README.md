@@ -5,7 +5,7 @@ Lightweight and easy to use.
 
 **Features**:
 - 🚀 **No dependencies** — pure TypeScript only;
-- 📦 **Size ~3.5 kB** — minimal impact on your bundle;
+- 📦 **Size ~3.4 kB** — minimal impact on your bundle;
 - 🏅 **SonarQube `A` Rating** — highest level of code quality and reliability;
 - 🎨 **Console output styling** — color formatting for quick identification;
 - 💾 **Global storage** — access debug data via `window`;
@@ -77,6 +77,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | Level     | Style (CSS)                                                                |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
+| `mark`    | `background-color: #695aff; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
 | `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
@@ -142,26 +143,32 @@ Default aliases: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`,
 
 
 ```typescript
+type DebugWebData = Record<string, unknown>
+
 type DumpOptions = {
   level?: DebugLogLevel;
-  title?: string | ((data) => string);
+  title?: string | ((data: DebugWebData) => string);
   open?: boolean;
 }
 ```
 
 #### Level management
 
-| Method     | Type                                     | Comment                                             |
-|------------|------------------------------------------|-----------------------------------------------------|
-| `setLevel` | `(level: DebugLogLevel \| true) => void` | Sets the minimum level; `true` resets it to `'log'` |
+| Method           | Type            | Comment                       |
+|------------------|-----------------|-------------------------------|
+| `level` (getter) | `DebugLogLevel` | Get the current logging level |
+| `level` (setter) | `DebugLogLevel` | Set the current logging level |
 
 #### Styling
 
-| Method     | Type                                            | Comment                    |
-|------------|-------------------------------------------------|----------------------------|
-| `setStyle` | `(level: DebugLogLevel, style: string) => void` | Sets the style for a level |
-| `setStyle` | `(styles: DebugWebStyle) => void`               | Sets multiple styles       |
-| `getStyle` | `() => DebugWebStyle`                           | Returns current styles     |
+| Method           | Type                              | Comment                                |
+|------------------|-----------------------------------|----------------------------------------|
+| `style` (getter) | `() => DebugWebStyle`             | Get the current styles map             |
+| `style` (setter) | `(styles: DebugWebStyle) => void` | Update the styles map (will be merged) |
+
+```typescript
+type DebugWebStyle = Record<DebugLogLevel, string | undefined>
+```
 
 ### Debug data
 

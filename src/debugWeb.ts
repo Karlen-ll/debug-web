@@ -1,31 +1,31 @@
-import { defaultStyle, stylizeAttrs } from './stylize';
-import { isSSR, isString, isFunc, getArray, getWindowKey, getGroupMethod, getStoredLvl, setStoredLvl } from '@/utils';
-import { DEFAULT_LVL_MAP, DEBUG, LOG, INFO, WARN, ERROR } from '@/const';
+import { stylizeAttrs } from './stylize';
+import {
+  isSSR,
+  isFunc,
+  isDefined,
+  getArray,
+  getWindowKey,
+  getGroupMethod,
+  getStoredLvl,
+  setStoredLvl,
+} from '@/utils';
+import { DEFAULT_LVL_MAP, DEBUG, LOG, INFO, WARN, ERROR, DEFAULT_STYLE } from '@/const';
 import type { ConsoleMethod, DebugWebData, DebugWebLogLevel, DebugWebOptions, DebugWebStyle } from '@/types';
 
 /** Class for centralized collection and output of debugging information */
 export class DebugWeb {
-  declare protected _lvl: number;
+  declare protected _lvl: DebugWebLogLevel;
   declare protected _app: string;
   declare protected _prop: string | null;
   declare protected _style: DebugWebStyle;
   declare protected _native: boolean;
   declare protected _local: boolean;
-  declare protected _lvlMap: Partial<Record<DebugWebLogLevel, number>>;
+
+  /** Log levels mapping */
+  declare protected _map: Partial<Record<DebugWebLogLevel, number>>;
 
   constructor(options?: DebugWebOptions) {
-    this._app = options?.app || '_debug_web';
-    this._prop = options?.prop ?? INFO;
-    this._lvlMap = DEFAULT_LVL_MAP;
-    this._lvl = this.calcLvl(options?.level);
-    this._native = options?.native ?? false;
-    this._local = options?.local ?? false;
-    this._style = { ...defaultStyle, ...options?.style };
-
-    if (options?.data) {
-      this.set(options.data);
-    }
-
+    this.init(options);
     this.attach();
   }
 
@@ -132,6 +132,26 @@ export class DebugWeb {
     Object.defineProperty(window, storageName, { value, writable: true, enumerable: false, configurable: true });
   }
 
+  /** Persist log level */
+  set level(level: DebugWebLogLevel) {
+    this._lvl = level;
+  }
+
+  /** Get current log level as string */
+  get level() {
+    return this._lvl;
+  }
+
+  /** Get styles map by logging level */
+  get style(): DebugWebStyle {
+    return this._style;
+  }
+
+  /** Update styles map by logging level or entirely */
+  set style(style: DebugWebStyle) {
+    Object.assign(this._style, style);
+  }
+
   /** Get all collected debugging data */
   get(api?: boolean) {
     if (isSSR()) return;
@@ -139,7 +159,7 @@ export class DebugWeb {
     const data = { ...window[getWindowKey(this._app)] } as DebugWebData;
 
     if (api) {
-      data.setLevel = this.setLevel.bind(this);
+      data.setLevel = this.setLvl.bind(this);
     }
 
     return data;
@@ -174,7 +194,7 @@ export class DebugWeb {
     this.call(
       'table',
       [keys.reduce<DebugWebData>((acc, key, index) => {
-        if (!(isSimple && index === 0) && typeof data[key] !== 'undefined') {
+        if (!(isSimple && index === 0) && isDefined(data[key])) {
           acc[key] = data[key];
         }
 
@@ -188,35 +208,6 @@ export class DebugWeb {
     this.call('groupEnd', [], options?.level, false, true);
   }
 
-  /** Set logging level for filtering console output
-   * @param level - Target log level or true to reset to default ('log')
-   * @desc Reset to default level when called without arguments: debug.setLevel()
-   * @example debug.setLevel('error')
-   */
-  setLevel(level: DebugWebLogLevel | true = true) {
-    const lvl = level === true ? LOG : level;
-    const value = { num: this.getLvl(lvl), lvl };
-
-    if (value.num >= 0) {
-      this._lvl = value.num;
-      setStoredLvl(this._app, value.lvl, this._local);
-    }
-  }
-
-  /** Update styles map by logging level or entirely */
-  setStyle(levelOrMap: DebugWebLogLevel | DebugWebStyle, style?: string | null) {
-    if (isString(levelOrMap)) {
-      this._style[levelOrMap] = style;
-    } else {
-      Object.assign(this._style, levelOrMap);
-    }
-  }
-
-  /** Get styles map by logging level */
-  getStyle(): DebugWebStyle {
-    return this._style;
-  }
-
   /** Core method for logging with level filtering and formatting
    * @param method - Console method to use (log, info, warn, etc.)
    * @param attrs - Single value or array of values to log
@@ -226,26 +217,50 @@ export class DebugWeb {
    * @returns void, exits early if level is below current threshold (unless forced)
    */
   call(method: ConsoleMethod, attrs: unknown | unknown[], level?: DebugWebLogLevel, stylize = false, force = false) {
-    if (!force && this.getLvl(level, this.getLvl(INFO)) < this._lvl) return;
+    // Default value, all unspecified values will have priority — INFO
+    const info = this._map[INFO]!;
+
+    if (!force && this.getLvl(level, info) < this.getLvl(this._lvl, info)) {
+      return;
+    }
+
     this.print(method, getArray(attrs), level, stylize ? !this._native : false);
   }
 
-  /** Determine initial logging level based on stored value and options */
-  protected calcLvl(level?: DebugWebLogLevel): number {
-    const storedLevel = this.getLvl(getStoredLvl(this._app, this._local));
-    const value = storedLevel >= 0 ? storedLevel : this.getLvl(level);
+  /** Configure instance */
+  protected init(options?: DebugWebOptions) {
+    this._app = options?.app || '_debug_web';
+    this._prop = isDefined(options?.prop) ? options.prop : INFO;
+    this._map = DEFAULT_LVL_MAP;
+    this._lvl = getStoredLvl(this._app, this._local) || options?.level || LOG;
+    this._native = options?.native || false;
+    this._local = options?.local || false;
+    this._style = { ...DEFAULT_STYLE, ...options?.style };
 
-    return value >= 0 ? value : this.getLvl(LOG);
+    if (options?.data) {
+      this.set(options.data);
+    }
   }
 
   /** Get logging level priority number */
-  protected getLvl(level?: DebugWebLogLevel | null, defaultValue = -1): number {
-    return (level ? this._lvlMap[level] : undefined) ?? defaultValue;
+  protected getLvl(level?: DebugWebLogLevel, defaultValue = -1): number {
+    const lvl = level ? this._map[level] : undefined;
+
+    return isDefined(lvl) ? lvl : defaultValue;
+  }
+
+  /** Set log level and persist to storage for browser debugging
+   * @param level - Target log level or true to reset to default ('log')
+   */
+  protected setLvl(level: DebugWebLogLevel | true = true) {
+    this._lvl = level === true ? LOG : level;
+    setStoredLvl(this._app, this._lvl, this._local);
   }
 
   /** Format and output data using specified console method and level styling */
   protected print(method: ConsoleMethod, attrs: unknown[], level: DebugWebLogLevel = INFO, stylize?: boolean) {
     const args = stylize ? stylizeAttrs(attrs, this._style[level]) : attrs;
+
     console[method](...args as never[]);
   }
 }

@@ -13,17 +13,6 @@ window.debugWeb = createDebug({
 
 window.debugWeb.dump(['description', 'time'], {
   title: (data) => `${data.message} 😊`,
-  level: 'error',
+  level: 'info',
   open: true,
 });
-
-window.logs = function() {
-  debugWeb.debug('Debug');
-  debugWeb.log('Log');
-  debugWeb.info('Info');
-  debugWeb.success('Success');
-  debugWeb.alert('Alert');
-  debugWeb.danger('Danger');
-  debugWeb.warn('Warn');
-  debugWeb.error('Error');
-}

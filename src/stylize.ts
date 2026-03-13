@@ -1,12 +1,14 @@
 import { isString } from '@/utils';
 
+const BACKGROUND = 'background';
+
 /**
  * Style a message for console
  * @desc CSS-style format: `background-color: red; color: white`
  * @example console.log(...stylizeMessage('Error', 'color:red'))
  */
 export const stylizeMsg = (message: unknown, style: string): [string, string] => {
-  return [style.includes('background') ? `%c ${message} ` : `%c${message}`, style];
+  return [style.includes(BACKGROUND) ? `%c ${message} ` : `%c${message}`, style];
 };
 
 /**
@@ -22,14 +24,6 @@ export const stylizeAttrs = (attrs: unknown[], styles?: string | null) => {
 };
 
 /** Generate simple CSS styles */
-const getStyle = (bg: string, color = '#fff') => {
-  return `background: ${bg}; color: ${color}; padding: 2px; border-radius: 3px;`;
-};
-
-export const defaultStyle = {
-  info: getStyle('#155adc'),
-  success: getStyle('#13a10e'),
-  focus: getStyle('#881798'),
-  alert: getStyle('#ffa500'),
-  danger: getStyle('#dc143c'),
+export const getStyle = (bg?: string, color = '#fff') => {
+  return `${bg ? `${BACKGROUND}:${bg};` : ''}color:${color};padding:2px;border-radius:3px`;
 };

@@ -42,8 +42,8 @@
   "scripts": {
     "build": "rollup -c",
     "build:pack": "npm run build && npm pack",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest run --coverage"

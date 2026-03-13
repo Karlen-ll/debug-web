@@ -5,7 +5,7 @@
 
 **特点**:
 - 🚀 **无依赖** — 纯 TypeScript 编写；
-- 📦 **体积 ~3.5 kB** — 对打包体积影响极小；
+- 📦 **体积 ~3.4 kB** — 对打包体积影响极小；
 - 🏅 **SonarQube `A` 评级** — 最高级别的代码质量和可靠性；
 - 🎨 **控制台输出样式** — 彩色格式化，便于快速识别；
 - 💾 **全局存储** — 通过 `window` 访问调试数据；
@@ -77,6 +77,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | 级别        | 样式 (CSS)                                                                   |
 |-----------|----------------------------------------------------------------------------|
 | `info`    | `background-color: #155adc; color: #fff; padding: 2px; border-radius: 3px` |
+| `mark`    | `background-color: #695aff; color: #fff; padding: 2px; border-radius: 3px` |
 | `success` | `background-color: #13a10e; color: #fff; padding: 2px; border-radius: 3px` |
 | `focus`   | `background-color: #881798; color: #fff; padding: 2px; border-radius: 3px` |
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
@@ -142,26 +143,32 @@ export const debug = new DebugWeb({
 
 
 ```typescript
+type DebugWebData = Record<string, unknown>
+
 type DumpOptions = {
   level?: DebugLogLevel;
-  title?: string | ((data) => string);
+  title?: string | ((data: DebugWebData) => string);
   open?: boolean;
 }
 ```
 
 #### 级别管理
 
-| 方法         | 类型                                       | 注释                            |
-|------------|------------------------------------------|-------------------------------|
-| `setLevel` | `(level: DebugLogLevel \| true) => void` | 设置最低级别；传入 `true` 则重置为 `'log'` |
+| 方法               | 类型              | 注释       |
+|------------------|-----------------|----------|
+| `level` (getter) | `DebugLogLevel` | 获取当前日志级别 |
+| `level` (setter) | `DebugLogLevel` | 设置当前日志级别 |
 
 #### 样式设置
 
-| 方法         | 类型                                              | 注释        |
-|------------|-------------------------------------------------|-----------|
-| `setStyle` | `(level: DebugLogLevel, style: string) => void` | 为某个级别设置样式 |
-| `setStyle` | `(styles: DebugWebStyle) => void`               | 设置多个样式    |
-| `getStyle` | `() => DebugWebStyle`                           | 返回当前样式    |
+| 方法               | 类型                                | 注释           |
+|------------------|-----------------------------------|--------------|
+| `style` (getter) | `() => DebugWebStyle`             | 获取当前样式映射表    |
+| `style` (setter) | `(styles: DebugWebStyle) => void` | 更新样式映射表（将合并） |
+
+```typescript
+type DebugWebStyle = Record<DebugLogLevel, string | undefined>
+```
 
 ### 调试数据
 

@@ -1,3 +1,5 @@
+import { getStyle } from '@/stylize';
+
 /** Console method names as constants for better minification */
 export const LOG = 'log';
 export const INFO = 'info';
@@ -16,4 +18,13 @@ export const DEFAULT_ALIAS_MAP = {
   w: WARN,
   e: ERROR,
   update: 'set',
+};
+
+export const DEFAULT_STYLE = {
+  [INFO]: getStyle('#155adc'),
+  mark: getStyle('#695aff'),
+  success: getStyle('#13a10e'),
+  focus: getStyle('#881798'),
+  alert: getStyle('#ffa500'),
+  danger: getStyle('#dc143c'),
 };
