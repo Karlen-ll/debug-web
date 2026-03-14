@@ -1,6 +1,6 @@
 {
   "name": "debug-web",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Browser debug utility with console styling and persistent levels (ES2018+)",
   "keywords": [
     "browser",
