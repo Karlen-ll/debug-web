@@ -52,8 +52,10 @@ Priorität (niedrig nach hoch):
 4. `warn` (3) —  Warnungen (`console.warn`);
 5. `error` (4) — Fehler (`console.error`).
 
-ℹ️ Benutzerdefinierte Ebenen: beliebige Zeichenfolgen (z.B. `success`, `focus`) werden als `info`-Ebene verarbeitet
-und können eigene Stile haben.
+ℹ️ Benutzerdefinierte Ebenen: beliebige Zeichenfolgen (z.B. `success`, `focus`) werden mit spezifischem Verhalten verarbeitet:
+- Reguläre benutzerdefinierte Ebenen (ohne Unterstrich-Präfix) verwenden die `info`-Ebene
+- Ebenen, die mit Unterstrich beginnen (z.B. `_info`, `_error`), verwenden die `debug`-Ebene
+  Beide können eigene Stile haben.
 
 ## Optionen ⚙️
 

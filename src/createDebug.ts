@@ -1,6 +1,6 @@
 import { DebugWeb } from '@/debugWeb';
 import { isFunc } from '@/utils';
-import { DEFAULT_ALIAS_MAP, INFO } from '@/const';
+import { DEBUG, DEFAULT_ALIAS_MAP, INFO } from '@/const';
 import { CreateDebugOptions, CustomLogLevels, DebugWebAliasMap, DebugWebTitleMap } from '@/types';
 
 /** Creates a proxy for DebugWeb instance that allows dynamic logging levels */
@@ -21,7 +21,12 @@ export function createDebug<T extends typeof DebugWeb>(
       }
 
       return (...attrs: unknown[]) => {
-        return target.call(INFO, titleMap[prop] ? [titleMap[prop], ...attrs] : attrs, prop, true);
+        return target.call(
+          prop.startsWith('_') ? DEBUG : INFO,
+          titleMap[prop] ? [titleMap[prop], ...attrs] : attrs,
+          prop,
+          true
+        );
       };
     }
   }) as CustomLogLevels & InstanceType<T>;

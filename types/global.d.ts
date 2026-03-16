@@ -3,10 +3,10 @@ import type { DebugWebData } from '@/debugWeb';
 declare global {
   interface Window {
     // Default prop name
-    info?: DebugWebData
+    debug?: DebugWebData
 
     // Test prop name
-    debug?: DebugWebData
+    _debug?: DebugWebData
   }
 }
 

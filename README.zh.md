@@ -52,7 +52,10 @@ yarn add debug-web
 4. `warn` (3) — 警告 (`console.warn`)
 5. `error` (4) — 错误 (`console.error`)
 
-ℹ️ 自定义级别：任何字符串值（例如 `success`、`focus`）都将作为 `info` 级别处理，并且可以拥有独立的样式。
+ℹ️ 自定义级别：任何字符串值（例如 `success`、`focus`）将按特定方式处理：
+- 常规自定义级别（不带下划线前缀）使用 `info` 级别
+- 以下划线开头的级别（例如 `_info`、`_error`）使用 `debug` 级别
+  两者都可以有自己的样式。
 
 ## 选项 ⚙️
 

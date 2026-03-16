@@ -157,7 +157,6 @@ describe('DebugWeb', () => {
     });
 
     it('logs with custom level', () => {
-      reset();
       debug.call('log', [TEST_MESSAGE], 'success');
       expect(console.log).toHaveBeenCalled();
     });
@@ -165,6 +164,11 @@ describe('DebugWeb', () => {
     it('dynamic methods', () => {
       debug.success?.(TEST_MESSAGE);
       expect(console.info).toHaveBeenCalled();
+    });
+
+    it('dynamic methods', () => {
+      debug._route?.(TEST_MESSAGE);
+      expect(console.debug).toHaveBeenCalled();
     });
   });
 

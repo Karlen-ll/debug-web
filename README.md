@@ -52,7 +52,10 @@ Priority (from lowest to highest):
 4. `warn` (3) —  warnings (`console.warn`)
 5. `error` (4) — errors (`console.error`)
 
-ℹ️ Custom levels: any string values (e.g., `success`, `focus`) will be processed as `info` level and can have their own styles.
+ℹ️ Custom levels: any string values (e.g., `success`, `focus`) will be processed with specific behavior:
+- Regular custom levels (without underscore prefix) use the `info` level
+- Levels starting with underscore (e.g., `_info`, `_error`) use the `debug` level
+  Both can have their own styles.
 
 ## Options ⚙️
 

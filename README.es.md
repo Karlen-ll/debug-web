@@ -52,8 +52,10 @@ Prioridad (de menor a mayor):
 4. `warn` (3) —  advertencias (`console.warn`)
 5. `error` (4) — errores (`console.error`)
 
-ℹ️ Niveles personalizados: cualquier valor de cadena (por ejemplo, `success`, `focus`) será procesado como nivel `info`
-y puede tener sus propios estilos.
+ℹ️ Niveles personalizados: cualquier valor de cadena (por ejemplo, `success`, `focus`) se procesará con un comportamiento específico:
+- Los niveles personalizados regulares (sin prefijo de guión bajo) utilizan el nivel `info`
+- Los niveles que comienzan con guión bajo (por ejemplo, `_info`, `_error`) utilizan el nivel `debug`
+  Ambos pueden tener sus propios estilos.
 
 ## Opciones ⚙️
 
