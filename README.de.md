@@ -65,7 +65,7 @@ und können eigene Stile haben.
 | `data`    | `Record<string, unknown>`       | —                              | Initiale Debug-Daten                                                         |
 | `local`   | `boolean`                       | `false`                        | Ebene in `localStorage` speichern (sonst `sessionStorage`)                   |
 | `native`  | `boolean`                       | `false`                        | Native Konsolenmethoden (ohne Stile) verwenden                               |
-| `alias`   | `Record<string, DebugLogLevel>` | '{}'                           | Benutzerdefinierte Aliase für `createDebug`                                  |
+| `alias`   | `Record<string, DebugLogLevel>` | `{}`                           | Benutzerdefinierte Aliase für `createDebug`                                  |
 | `title`   | `Record<string, string>`        | `undefined`                    | Titel für benutzerdefinierte Protokollierungsebenen                          |
 | `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile-) | CSS-Stile für die Protokollierungsebenen                                     |
 

@@ -65,7 +65,7 @@ y puede tener sus propios estilos.
 | `data`    | `Record<string, unknown>`       | —                                  | Datos iniciales de depuración                                               |
 | `local`   | `boolean`                       | `false`                            | Guardar el nivel en `localStorage` (de lo contrario en `sessionStorage`)    |
 | `native`  | `boolean`                       | `false`                            | Usar métodos nativos de la consola (sin estilos)                            |
-| `alias`   | `Record<string, DebugLogLevel>` | '{}'                               | Alias personalizados para `createDebug`                                     |
+| `alias`   | `Record<string, DebugLogLevel>` | `{}`                               | Alias personalizados para `createDebug`                                     |
 | `title`   | `Record<string, string>`        | `undefined`                        | Títulos para niveles de registro personalizados                             |
 | `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto-) | Estilos CSS para los niveles de registro                                    |
 

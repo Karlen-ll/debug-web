@@ -65,7 +65,7 @@ yarn add debug-web
 | `data`   | `Record<string, unknown>`       | —                                | Начальные отладочные данные                                                |
 | `local`  | `boolean`                       | `false`                          | Сохранять уровень в `localStorage` (иначе `sessionStorage`)                |
 | `native` | `boolean`                       | `false`                          | Использовать нативные методы консоли (без стилей)                          |
-| `alias`  | `Record<string, DebugLogLevel>` | '{}'                             | Пользовательские алиасы для `createDebug`                                  |
+| `alias`  | `Record<string, DebugLogLevel>` | `{}`                             | Пользовательские алиасы для `createDebug`                                  |
 | `title`  | `Record<string, string>`        | `undefined`                      | Заголовки для пользовательских уровней логирования                         |
 | `style`  | `Record<DebugLogLevel, string>` | см. [ниже](#стили-по-умолчанию-) | CSS-стили для уровлей логирования                                          |
 

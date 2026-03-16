@@ -64,7 +64,7 @@ yarn add debug-web
 | `data`   | `Record<string, unknown>`       | —              | 初始调试数据                                          |
 | `local`  | `boolean`                       | `false`        | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
 | `native` | `boolean`                       | `false`        | 使用原生控制台方法（不带样式）                                 |
-| `alias`  | `Record<string, DebugLogLevel>` | '{}'           | `createDebug` 的自定义别名                            |
+| `alias`  | `Record<string, DebugLogLevel>` | `{}`           | `createDebug` 的自定义别名                            |
 | `title`  | `Record<string, string>`        | `undefined`    | 自定义日志级别的标题                                      |
 | `style`  | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式-) | 日志级别的 CSS 样式                                    |
 

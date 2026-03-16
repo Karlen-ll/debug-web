@@ -64,7 +64,7 @@ Priority (from lowest to highest):
 | `data`    | `Record<string, unknown>`       | —                             | Initial debug data                                               |
 | `local`   | `boolean`                       | `false`                       | Save level in `localStorage` (otherwise `sessionStorage`)        |
 | `native`  | `boolean`                       | `false`                       | Use native console methods (without styles)                      |
-| `alias`   | `Record<string, DebugLogLevel>` | '{}'                          | Custom aliases for `createDebug`                                 |
+| `alias`   | `Record<string, DebugLogLevel>` | `{}`                          | Custom aliases for `createDebug`                                 |
 | `title`   | `Record<string, string>`        | `undefined`                   | Titles for custom log levels                                     |
 | `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles-) | CSS styles for log levels                                        |
 
