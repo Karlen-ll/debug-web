@@ -13,7 +13,7 @@ export interface DebugWebOptions {
   level?: DebugWebLogLevel;
 
   /** Variable name in window (if null, do not create)
-   * @default 'info' */
+   * @default 'debug' */
   prop?: string | null;
 
   /** Important debugging data */
@@ -32,7 +32,16 @@ export interface DebugWebOptions {
 }
 
 export type DebugWebAliasMap = Record<string, DebugWebLogLevel>
-export type CreateDebugOptions = DebugWebOptions & { aliases?: DebugWebAliasMap };
+export type DebugWebTitleMap = Record<string, string>
+
+export type CreateDebugOptions = DebugWebOptions & {
+  /** Aliases map */
+  alias?: DebugWebAliasMap
+
+  /** Titles map for custom loggers */
+  title?: DebugWebTitleMap
+};
+
 export type CustomLogLevels = Record<string, (...attrs: unknown[]) => void>;
 
 export type ConsoleMethod =

@@ -5,7 +5,7 @@ NPM-пакет для отладки в браузере с настраивае
 
 **Преимущества**:
 - 🚀 **Нет зависимостей** — только чистый TypeScript;
-- 📦 **Вес ~3.4 kB** — минимальное влияние на бандл;
+- 📦 **Вес ~3.5 kB** — минимальное влияние на бандл;
 - 🏅 **Рейтинг SonarQube `A`** — высший уровень качества кода и надёжности;
 - 🎨 **Стилизация console-выводов** — цветное форматирование для быстрой идентификации;
 - 💾 **Глобальное хранилище** — доступ к отладочным данным через `window`;
@@ -18,7 +18,6 @@ NPM-пакет для отладки в браузере с настраивае
 - [Установка](#установка-)
 - [Уровни логирования](#уровни-логирования-)
 - [Опции](#опции-)
-- [Стили по умолчанию](#стили-по-умолчанию-)
 - [API](#api-)
   - [createDebug](#функция-createdebug)
   - [Методы логирования](#методы-логирования)
@@ -58,16 +57,17 @@ yarn add debug-web
 
 ## Опции ⚙️
 
-| Параметр  | Тип                             | По умолчанию                     | Описание                                                                   |
-|-----------|---------------------------------|----------------------------------|----------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'_debug_web'`                   | Уникальное имя приложения для разделения данных                            |
-| `level`   | `DebugLogLevel`                 | `'log'`                          | Минимальный уровень логирования (сообщения ниже этого уровня не выводятся) |
-| `prop`    | `string` \| `null`              | `'info'`                         | Имя глобальной переменной для доступа к данным (`null` — не создавать)     |
-| `data`    | `Record<string, unknown>`       | —                                | Начальные отладочные данные                                                |
-| `local`   | `boolean`                       | `false`                          | Сохранять уровень в `localStorage` (иначе `sessionStorage`)                |
-| `native`  | `boolean`                       | `false`                          | Использовать нативные методы консоли (без стилей)                          |
-| `aliases` | `Record<string, DebugLogLevel>` | '{}'                             | Пользовательские алиасы для `createDebug`                                  |
-| `style`   | `Record<DebugLogLevel, string>` | см. [ниже](#стили-по-умолчанию-) | CSS-стили для уровлей логирования                                          |
+| Параметр | Тип                             | По умолчанию                     | Описание                                                                   |
+|----------|---------------------------------|----------------------------------|----------------------------------------------------------------------------|
+| `app`    | `string` \| `null`              | `'_debug_web'`                   | Уникальное имя приложения для разделения данных                            |
+| `level`  | `DebugLogLevel`                 | `'log'`                          | Минимальный уровень логирования (сообщения ниже этого уровня не выводятся) |
+| `prop`   | `string` \| `null`              | `'debug'`                        | Имя глобальной переменной для доступа к данным (`null` — не создавать)     |
+| `data`   | `Record<string, unknown>`       | —                                | Начальные отладочные данные                                                |
+| `local`  | `boolean`                       | `false`                          | Сохранять уровень в `localStorage` (иначе `sessionStorage`)                |
+| `native` | `boolean`                       | `false`                          | Использовать нативные методы консоли (без стилей)                          |
+| `alias`  | `Record<string, DebugLogLevel>` | '{}'                             | Пользовательские алиасы для `createDebug`                                  |
+| `title`  | `Record<string, string>`        | `undefined`                      | Заголовки для пользовательских уровней логирования                         |
+| `style`  | `Record<DebugLogLevel, string>` | см. [ниже](#стили-по-умолчанию-) | CSS-стили для уровлей логирования                                          |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
@@ -84,6 +84,10 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
 | `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
+### Алиасы по умолчанию
+
+`d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
 ## Как использовать 💡
 
 ### Создание экземпляра
@@ -96,7 +100,7 @@ export const debug = new DebugWeb({
   app: 'my-app',
   level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
   data: { version: APP_VERSION },
-  aliases: { s: 'success', f: 'focus' },
+  alias: { s: 'success', f: 'focus' },
   local: true,
 });
 ```
@@ -110,8 +114,6 @@ export const debug = new DebugWeb({
 ```typescript
 <T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
-
-Алиасы по умолчанию: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
 #### Методы логирования
 
@@ -179,12 +181,12 @@ type DebugWebStyle = Record<DebugLogLevel, string | undefined>
 debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-Данные доступны через `window[prop]` (по умолчанию `info`).\
+Данные доступны через `window[prop]` (по умолчанию `debug`).\
 Введите в консоль браузера:
 
 ```javascript
-  info // { error: null, user: {...}, setLevel: f }
-  info.setLevel() // изменить уровень логирования
+  debug // { error: null, user: {...}, setLevel: f }
+  debug.setLevel() // изменить уровень логирования
 ```
 
 ## Поддержка ❤️

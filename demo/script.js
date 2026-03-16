@@ -7,7 +7,8 @@ window.debugWeb = createDebug({
     description: 'Browser debug utility',
     time: new Date().toISOString(),
   },
-  style: { custom: 'color: orange' },
+  style: { custom: 'color: orange', debug: 'color:#155adc' },
+  title: { custom: 'Title!' },
   native: false,
 });
 

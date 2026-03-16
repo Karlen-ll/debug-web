@@ -5,7 +5,7 @@ Leichtgewichtig und einfach zu bedienen.
 
 **Eigenschaften**:
 - 🚀 **Keine Abhängigkeiten** — reines TypeScript;
-- 📦 **Größe ~3.4 kB** — minimaler Einfluss auf Ihr Bundle;
+- 📦 **Größe ~3.5 kB** — minimaler Einfluss auf Ihr Bundle;
 - 🏅 **SonarQube `A` Bewertung** — höchstes Maß an Codequalität und Zuverlässigkeit;
 - 🎨 **Konsolen-Styling** — farbliche Formatierung zur schnellen Identifikation;
 - 💾 **Globaler Speicher** — Zugriff auf Debug-Daten über `window`;
@@ -18,7 +18,6 @@ Leichtgewichtig und einfach zu bedienen.
 - [Installation](#installation-)
 - [Protokollierungsebenen](#protokollierungsebenen-)
 - [Optionen](#optionen-)
-- [Standardstile](#standardstile-)
 - [API](#api-)
   - [createDebug](#funktion-createdebug)
   - [Protokollierungsmethoden](#protokollierungsmethoden)
@@ -62,11 +61,12 @@ und können eigene Stile haben.
 |-----------|---------------------------------|--------------------------------|------------------------------------------------------------------------------|
 | `app`     | `string` \| `null`              | `'_debug_web'`                 | Eindeutiger App-Name zur Trennung von Daten                                  |
 | `level`   | `DebugLogLevel`                 | `'log'`                        | Minimale Protokollierungsebene (Nachrichten darunter werden nicht angezeigt) |
-| `prop`    | `string` \| `null`              | `'info'`                       | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
+| `prop`    | `string` \| `null`              | `'debug'`                      | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
 | `data`    | `Record<string, unknown>`       | —                              | Initiale Debug-Daten                                                         |
 | `local`   | `boolean`                       | `false`                        | Ebene in `localStorage` speichern (sonst `sessionStorage`)                   |
 | `native`  | `boolean`                       | `false`                        | Native Konsolenmethoden (ohne Stile) verwenden                               |
-| `aliases` | `Record<string, DebugLogLevel>` | '{}'                           | Benutzerdefinierte Aliase für `createDebug`                                  |
+| `alias`   | `Record<string, DebugLogLevel>` | '{}'                           | Benutzerdefinierte Aliase für `createDebug`                                  |
+| `title`   | `Record<string, string>`        | `undefined`                    | Titel für benutzerdefinierte Protokollierungsebenen                          |
 | `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile-) | CSS-Stile für die Protokollierungsebenen                                     |
 
 ```typescript
@@ -84,6 +84,10 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
 | `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
+### Standard-Aliase
+
+`d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
 ## Verwendung 💡
 
 ### Erstellen einer Instanz
@@ -96,7 +100,7 @@ export const debug = new DebugWeb({
   app: 'my-app',
   level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
   data: { version: APP_VERSION },
-  aliases: { s: 'success', f: 'focus' },
+  alias: { s: 'success', f: 'focus' },
   local: true,
 });
 ```
@@ -110,8 +114,6 @@ Erstellt einen Proxy mit Aliasen und Unterstützung für benutzerdefinierte Eben
 ```typescript
 <T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
-
-Standard-Aliase: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
 #### Protokollierungsmethoden
 
@@ -179,12 +181,12 @@ Speichern Sie beliebige Daten und betrachten Sie sie in der Konsole:
 debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-Daten sind über `window[prop]` (Standard ist `info`) zugänglich.
+Daten sind über `window[prop]` (Standard ist `debug`) zugänglich.
 Geben Sie in der Browserkonsole ein:
 
 ```javascript
-  info // { error: null, user: {...}, setLevel: f }
-  info.setLevel() // Protokollierungsebene ändern
+  debug // { error: null, user: {...}, setLevel: f }
+  debug.setLevel() // Protokollierungsebene ändern
 ```
 
 ## Unterstützung ❤️

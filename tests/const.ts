@@ -6,11 +6,11 @@ export const CONSOLE_METHODS = [
 ] as const;
 
 export const DEFAULT_APP_NAME = getWindowKey('_debug_web');
-export const DEFAULT_PROP_NAME = 'info' as const;
+export const DEFAULT_PROP_NAME = 'debug' as const;
 
 export const TEST_RAW_APP_NAME = 'core' as const;
 export const TEST_APP_NAME = getWindowKey(TEST_RAW_APP_NAME);
-export const TEST_PROP_NAME = 'debug' as const;
+export const TEST_PROP_NAME = '_debug' as const;
 
 export const TEST_MESSAGE = 'Text';
 export const TEST_STR_STYLE = 'color:red';

@@ -5,7 +5,7 @@ Lightweight and easy to use.
 
 **Features**:
 - 🚀 **No dependencies** — pure TypeScript only;
-- 📦 **Size ~3.4 kB** — minimal impact on your bundle;
+- 📦 **Size ~3.5 kB** — minimal impact on your bundle;
 - 🏅 **SonarQube `A` Rating** — highest level of code quality and reliability;
 - 🎨 **Console output styling** — color formatting for quick identification;
 - 💾 **Global storage** — access debug data via `window`;
@@ -18,7 +18,6 @@ Lightweight and easy to use.
 - [Installation](#installation-)
 - [Log levels](#log-levels-)
 - [Options](#options-)
-- [Default styles](#default-styles-)
 - [API](#api-)
   - [createDebug](#createdebug-function)
   - [Logging methods](#logging-methods)
@@ -61,11 +60,12 @@ Priority (from lowest to highest):
 |-----------|---------------------------------|-------------------------------|------------------------------------------------------------------|
 | `app`     | `string` \| `null`              | `'_debug_web'`                | Unique application name to separate data                         |
 | `level`   | `DebugLogLevel`                 | `'log'`                       | Minimum logging level (messages below this level are not output) |
-| `prop`    | `string` \| `null`              | `'info'`                      | Global variable name to access data (`null` — do not create)     |
+| `prop`    | `string` \| `null`              | `'debug'`                     | Global variable name to access data (`null` — do not create)     |
 | `data`    | `Record<string, unknown>`       | —                             | Initial debug data                                               |
 | `local`   | `boolean`                       | `false`                       | Save level in `localStorage` (otherwise `sessionStorage`)        |
 | `native`  | `boolean`                       | `false`                       | Use native console methods (without styles)                      |
-| `aliases` | `Record<string, DebugLogLevel>` | '{}'                          | Custom aliases for `createDebug`                                 |
+| `alias`   | `Record<string, DebugLogLevel>` | '{}'                          | Custom aliases for `createDebug`                                 |
+| `title`   | `Record<string, string>`        | `undefined`                   | Titles for custom log levels                                     |
 | `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles-) | CSS styles for log levels                                        |
 
 ```typescript
@@ -83,6 +83,10 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
 | `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
+### Default aliases
+
+`d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
 ## How to use 💡
 
 ### Creating an instance
@@ -95,7 +99,7 @@ export const debug = new DebugWeb({
   app: 'my-app',
   level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
   data: { version: APP_VERSION },
-  aliases: { s: 'success', f: 'focus' },
+  alias: { s: 'success', f: 'focus' },
   local: true,
 });
 ```
@@ -109,8 +113,6 @@ Creates a proxy with aliases and custom level support.
 ```typescript
 <T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
-
-Default aliases: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
 #### Logging methods
 
@@ -178,12 +180,12 @@ Save any data and view it in the console:
 debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-Data is accessible via `window[prop]` (default is `info`).
+Data is accessible via `window[prop]` (default is `debug`).
 Type into the browser console:
 
 ```javascript
-  info // { error: null, user: {...}, setLevel: f }
-  info.setLevel() // change logging level
+  debug // { error: null, user: {...}, setLevel: f }
+  debug.setLevel() // change logging level
 ```
 
 ## Support ❤️

@@ -5,7 +5,7 @@
 
 **特点**:
 - 🚀 **无依赖** — 纯 TypeScript 编写；
-- 📦 **体积 ~3.4 kB** — 对打包体积影响极小；
+- 📦 **体积 ~3.5 kB** — 对打包体积影响极小；
 - 🏅 **SonarQube `A` 评级** — 最高级别的代码质量和可靠性；
 - 🎨 **控制台输出样式** — 彩色格式化，便于快速识别；
 - 💾 **全局存储** — 通过 `window` 访问调试数据；
@@ -18,7 +18,6 @@
 - [安装](#安装-)
 - [日志级别](#日志级别-)
 - [选项](#选项-)
-- [默认样式](#默认样式-)
 - [API](#api-)
   - [createDebug](#createdebug-函数)
   - [日志记录方法](#日志记录方法)
@@ -57,16 +56,17 @@ yarn add debug-web
 
 ## 选项 ⚙️
 
-| 参数        | 类型                              | 默认值            | 描述                                              |
-|-----------|---------------------------------|----------------|-------------------------------------------------|
-| `app`     | `string` \| `null`              | `'_debug_web'` | 唯一的应用程序名称，用于分离数据                                |
-| `level`   | `DebugLogLevel`                 | `'log'`        | 最低日志级别（低于此级别的消息将不会输出）                           |
-| `prop`    | `string` \| `null`              | `'info'`       | 用于访问数据的全局变量名（`null` — 不创建）                      |
-| `data`    | `Record<string, unknown>`       | —              | 初始调试数据                                          |
-| `local`   | `boolean`                       | `false`        | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
-| `native`  | `boolean`                       | `false`        | 使用原生控制台方法（不带样式）                                 |
-| `aliases` | `Record<string, DebugLogLevel>` | '{}'           | `createDebug` 的自定义别名                            |
-| `style`   | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式-) | 日志级别的 CSS 样式                                    |
+| 参数       | 类型                              | 默认值            | 描述                                              |
+|----------|---------------------------------|----------------|-------------------------------------------------|
+| `app`    | `string` \| `null`              | `'_debug_web'` | 唯一的应用程序名称，用于分离数据                                |
+| `level`  | `DebugLogLevel`                 | `'log'`        | 最低日志级别（低于此级别的消息将不会输出）                           |
+| `prop`   | `string` \| `null`              | `'debug'`      | 用于访问数据的全局变量名（`null` — 不创建）                      |
+| `data`   | `Record<string, unknown>`       | —              | 初始调试数据                                          |
+| `local`  | `boolean`                       | `false`        | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
+| `native` | `boolean`                       | `false`        | 使用原生控制台方法（不带样式）                                 |
+| `alias`  | `Record<string, DebugLogLevel>` | '{}'           | `createDebug` 的自定义别名                            |
+| `title`  | `Record<string, string>`        | `undefined`    | 自定义日志级别的标题                                      |
+| `style`  | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式-) | 日志级别的 CSS 样式                                    |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
@@ -83,6 +83,10 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
 | `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
+### 默认别名
+
+`d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
 ## 如何使用 💡
 
 ### 创建实例
@@ -95,7 +99,7 @@ export const debug = new DebugWeb({
   app: 'my-app',
   level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
   data: { version: APP_VERSION },
-  aliases: { s: 'success', f: 'focus' },
+  alias: { s: 'success', f: 'focus' },
   local: true,
 });
 ```
@@ -109,8 +113,6 @@ export const debug = new DebugWeb({
 ```typescript
 <T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
-
-默认别名: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
 #### 日志记录方法
 
@@ -178,12 +180,12 @@ type DebugWebStyle = Record<DebugLogLevel, string | undefined>
 debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-可以通过 `window[prop]`（默认是 `info`）访问数据。
+可以通过 `window[prop]`（默认是 `debug`）访问数据。
 在浏览器控制台中输入：
 
 ```javascript
-  info // { error: null, user: {...}, setLevel: f }
-  info.setLevel() // 修改日志级别
+  debug // { error: null, user: {...}, setLevel: f }
+  debug.setLevel() // 修改日志级别
 ```
 
 ## 支持 ❤️

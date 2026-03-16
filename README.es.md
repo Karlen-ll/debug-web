@@ -5,7 +5,7 @@ Ligero y fácil de usar.
 
 **Características**:
 - 🚀 **Sin dependencias** — solo TypeScript puro;
-- 📦 **Peso ~3.4 kB** — impacto mínimo en tu bundle;
+- 📦 **Peso ~3.5 kB** — impacto mínimo en tu bundle;
 - 🏅 **Calificación SonarQube `A`** — el nivel más alto de calidad y confiabilidad de código;
 - 🎨 **Estilización de consola** — formato de colores para una identificación rápida;
 - 💾 **Almacenamiento global** — acceso a los datos de depuración a través de `window`;
@@ -18,7 +18,6 @@ Ligero y fácil de usar.
 - [Instalación](#instalación-)
 - [Niveles de registro](#niveles-de-registro-)
 - [Opciones](#opciones-)
-- [Estilos por defecto](#estilos-por-defecto-)
 - [API](#api-)
   - [createDebug](#función-createdebug)
   - [Métodos de registro](#métodos-de-registro)
@@ -62,11 +61,12 @@ y puede tener sus propios estilos.
 |-----------|---------------------------------|------------------------------------|-----------------------------------------------------------------------------|
 | `app`     | `string` \| `null`              | `'_debug_web'`                     | Nombre único de la aplicación para separar datos                            |
 | `level`   | `DebugLogLevel`                 | `'log'`                            | Nivel mínimo de registro (no se muestran mensajes por debajo de este nivel) |
-| `prop`    | `string` \| `null`              | `'info'`                           | Nombre de variable global para acceder a datos (`null` — no crear)          |
+| `prop`    | `string` \| `null`              | `'debug'`                          | Nombre de variable global para acceder a datos (`null` — no crear)          |
 | `data`    | `Record<string, unknown>`       | —                                  | Datos iniciales de depuración                                               |
 | `local`   | `boolean`                       | `false`                            | Guardar el nivel en `localStorage` (de lo contrario en `sessionStorage`)    |
 | `native`  | `boolean`                       | `false`                            | Usar métodos nativos de la consola (sin estilos)                            |
-| `aliases` | `Record<string, DebugLogLevel>` | '{}'                               | Alias personalizados para `createDebug`                                     |
+| `alias`   | `Record<string, DebugLogLevel>` | '{}'                               | Alias personalizados para `createDebug`                                     |
+| `title`   | `Record<string, string>`        | `undefined`                        | Títulos para niveles de registro personalizados                             |
 | `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto-) | Estilos CSS para los niveles de registro                                    |
 
 ```typescript
@@ -84,6 +84,11 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
 | `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
+
+### Alias por defecto
+
+`d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
+
 ## Cómo usar 💡
 
 ### Crear una instancia
@@ -96,7 +101,7 @@ export const debug = new DebugWeb({
   app: 'my-app',
   level: process.env.NODE_ENV === 'development' ? 'log' : 'error',
   data: { version: APP_VERSION },
-  aliases: { s: 'success', f: 'focus' },
+  alias: { s: 'success', f: 'focus' },
   local: true,
 });
 ```
@@ -110,8 +115,6 @@ Crea un proxy con alias y soporte para niveles personalizados.
 ```typescript
 <T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
 ```
-
-Alias por defecto: `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
 #### Métodos de registro
 
@@ -179,12 +182,12 @@ Guarde cualquier dato y véalo en la consola:
 debug.set({ error: null, user: { id: 1, name: 'John' } });
 ```
 
-Los datos son accesibles a través de `window[prop]` (por defecto es `info`).
+Los datos son accesibles a través de `window[prop]` (por defecto es `debug`).
 Escriba en la consola del navegador:
 
 ```javascript
-  info // { error: null, user: {...}, setLevel: f }
-  info.setLevel() // cambiar el nivel de registro
+  debug // { error: null, user: {...}, setLevel: f }
+  debug.setLevel() // cambiar el nivel de registro
 ```
 
 ## Soporte ❤️

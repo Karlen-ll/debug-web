@@ -18,8 +18,8 @@ export class DebugWeb {
   declare protected _app: string;
   declare protected _prop: string | null;
   declare protected _style: DebugWebStyle;
-  declare protected _native: boolean;
-  declare protected _local: boolean;
+  declare protected _native?: boolean;
+  declare protected _local?: boolean;
 
   /** Log levels mapping */
   declare protected _map: Partial<Record<DebugWebLogLevel, number>>;
@@ -46,19 +46,19 @@ export class DebugWeb {
     this.call(INFO, attrs, INFO, true);
   }
 
-  /** Output warning message */
+  /** Output warning message (not stylized) */
   warn(...attrs: unknown[]) {
     this.call(WARN, attrs, WARN);
   }
 
-  /** Output error message */
+  /** Output error message (not stylized) */
   error(...attrs: unknown[]) {
     this.call(ERROR, attrs, ERROR);
   }
 
   /** Output debug message with low priority */
   debug(message?: unknown, ...attrs: unknown[]) {
-    this.call(DEBUG, [message, ...attrs], DEBUG);
+    this.call(DEBUG, [message, ...attrs], DEBUG, true);
   }
 
   /** Open a group */
@@ -171,11 +171,13 @@ export class DebugWeb {
    * @param options.level - Logging level for the dump (default: 'info')
    * @param options.title - Custom title or function that returns title based on data
    * @param options.open - If true opens group expanded, if false collapsed (default: false)
+   * @param options.hint - Supporting information
    * @desc Groups related debug data into a collapsible console section with table view
    */
   dump(keys: string[], options?: {
     level?: DebugWebLogLevel;
     title?: string | ((data: DebugWebData) => string);
+    hint?: string
     open?: boolean
   }) {
     const data = this.get();
@@ -190,6 +192,10 @@ export class DebugWeb {
       true,
       true
     );
+
+    if (options?.hint) {
+      this.call('log', options.hint, options.level, false, true);
+    }
 
     this.call(
       'table',
@@ -230,11 +236,13 @@ export class DebugWeb {
   /** Configure instance */
   protected init(options?: DebugWebOptions) {
     this._app = options?.app || '_debug_web';
-    this._prop = isDefined(options?.prop) ? options.prop : INFO;
+    this._prop = isDefined(options?.prop) ? options.prop : 'debug';
+
     this._map = DEFAULT_LVL_MAP;
+    this._local = options?.local;
+    this._native = options?.native;
+
     this._lvl = getStoredLvl(this._app, this._local) || options?.level || LOG;
-    this._native = options?.native || false;
-    this._local = options?.local || false;
     this._style = { ...DEFAULT_STYLE, ...options?.style };
 
     if (options?.data) {
