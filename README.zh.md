@@ -4,6 +4,7 @@
 轻量且易于使用。
 
 **特点**:
+
 - 🚀 **无依赖** — 纯 TypeScript 编写；
 - 📦 **体积 ~3.5 kB** — 对打包体积影响极小；
 - 🏅 **SonarQube `A` 评级** — 最高级别的代码质量和可靠性；
@@ -53,6 +54,7 @@ yarn add debug-web
 5. `error` (4) — 错误 (`console.error`)
 
 ℹ️ 自定义级别：任何字符串值（例如 `success`、`focus`）将按特定方式处理：
+
 - 常规自定义级别（不带下划线前缀）使用 `info` 级别
 - 以下划线开头的级别（例如 `_info`、`_error`）使用 `debug` 级别
   两者都可以有自己的样式。
@@ -114,7 +116,7 @@ export const debug = new DebugWeb({
 创建一个支持别名和自定义级别的代理。
 
 ```typescript
-<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
+<T extends typeof DebugWeb>(options?: CreateDebugOptions, DebugClass?: T) => CustomLogLevels & InstanceType<T>;
 ```
 
 #### 日志记录方法
@@ -145,7 +147,6 @@ export const debug = new DebugWeb({
 | `set`  | `(data: DebugWebData) => void`                    | 保存调试数据（合并数据）                  |
 | `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | 返回所有数据的副本。如果传入 `true`，则添加辅助方法 |
 | `dump` | `(keys: string[], options?: DumpOptions) => void` | 以表格形式输出数据（忽略日志级别）             |
-
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -187,8 +188,8 @@ debug.set({ error: null, user: { id: 1, name: 'John' } });
 在浏览器控制台中输入：
 
 ```javascript
-  debug // { error: null, user: {...}, setLevel: f }
-  debug.setLevel() // 修改日志级别
+debug // { error: null, user: {...}, setLevel: f }
+debug.setLevel() // 修改日志级别
 ```
 
 ## 支持 ❤️
@@ -203,6 +204,7 @@ debug.set({ error: null, user: { id: 1, name: 'John' } });
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## 链接
+
 - [📝 更新日志](CHANGELOG.md)
 - [💻 源代码](https://github.com/Karlen-ll/debug-web)
 - [🐛 问题反馈](https://github.com/Karlen-ll/debug-web/issues)

@@ -4,6 +4,7 @@ Paquete NPM para depuración en el navegador con niveles de registro personaliza
 Ligero y fácil de usar.
 
 **Características**:
+
 - 🚀 **Sin dependencias** — solo TypeScript puro;
 - 📦 **Peso ~3.5 kB** — impacto mínimo en tu bundle;
 - 🏅 **Calificación SonarQube `A`** — el nivel más alto de calidad y confiabilidad de código;
@@ -49,10 +50,12 @@ Prioridad (de menor a mayor):
 1. `debug` (0) — información de depuración (`console.debug`);
 2. `log` (1) — mensajes básicos (`console.log`)
 3. `info` (2) — mensajes informativos (`console.info`)
-4. `warn` (3) —  advertencias (`console.warn`)
+4. `warn` (3) — advertencias (`console.warn`)
 5. `error` (4) — errores (`console.error`)
 
-ℹ️ Niveles personalizados: cualquier valor de cadena (por ejemplo, `success`, `focus`) se procesará con un comportamiento específico:
+ℹ️ Niveles personalizados: cualquier valor de cadena (por ejemplo, `success`, `focus`) se procesará con un
+comportamiento específico:
+
 - Los niveles personalizados regulares (sin prefijo de guión bajo) utilizan el nivel `info`
 - Los niveles que comienzan con guión bajo (por ejemplo, `_info`, `_error`) utilizan el nivel `debug`
   Ambos pueden tener sus propios estilos.
@@ -86,7 +89,6 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 | `alert`   | `background-color: #ffa500; color: #fff; padding: 2px; border-radius: 3px` |
 | `danger`  | `background-color: #dc143c; color: #fff; padding: 2px; border-radius: 3px` |
 
-
 ### Alias por defecto
 
 `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
@@ -115,7 +117,7 @@ export const debug = new DebugWeb({
 Crea un proxy con alias y soporte para niveles personalizados.
 
 ```typescript
-<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
+<T extends typeof DebugWeb>(options?: CreateDebugOptions, DebugClass?: T) => CustomLogLevels & InstanceType<T>;
 ```
 
 #### Métodos de registro
@@ -146,7 +148,6 @@ Crea un proxy con alias y soporte para niveles personalizados.
 | `set`  | `(data: DebugWebData) => void`                    | Guarda los datos de depuración (los fusiona)                                |
 | `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Devuelve una copia de todos los datos. Si es `true`, añade métodos de ayuda |
 | `dump` | `(keys: string[], options?: DumpOptions) => void` | Imprime los datos en formato tabla (ignora niveles de registro)             |
-
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -188,8 +189,8 @@ Los datos son accesibles a través de `window[prop]` (por defecto es `debug`).
 Escriba en la consola del navegador:
 
 ```javascript
-  debug // { error: null, user: {...}, setLevel: f }
-  debug.setLevel() // cambiar el nivel de registro
+debug // { error: null, user: {...}, setLevel: f }
+debug.setLevel() // cambiar el nivel de registro
 ```
 
 ## Soporte ❤️
@@ -204,6 +205,7 @@ Si esta biblioteca te resulta útil, considera apoyar su desarrollo:
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Enlaces
+
 - [📝 Historial de cambios](CHANGELOG.md)
 - [💻 Código fuente](https://github.com/Karlen-ll/debug-web)
 - [🐛 Reportes de errores](https://github.com/Karlen-ll/debug-web/issues)

@@ -4,6 +4,7 @@ NPM package for browser debugging with customizable logging levels (log, warn, e
 Lightweight and easy to use.
 
 **Features**:
+
 - 🚀 **No dependencies** — pure TypeScript only;
 - 📦 **Size ~3.5 kB** — minimal impact on your bundle;
 - 🏅 **SonarQube `A` Rating** — highest level of code quality and reliability;
@@ -49,10 +50,11 @@ Priority (from lowest to highest):
 1. `debug` (0) — debug information (`console.debug`);
 2. `log` (1) — basic messages (`console.log`)
 3. `info` (2) — informational messages (`console.info`)
-4. `warn` (3) —  warnings (`console.warn`)
+4. `warn` (3) — warnings (`console.warn`)
 5. `error` (4) — errors (`console.error`)
 
 ℹ️ Custom levels: any string values (e.g., `success`, `focus`) will be processed with specific behavior:
+
 - Regular custom levels (without underscore prefix) use the `info` level
 - Levels starting with underscore (e.g., `_info`, `_error`) use the `debug` level
   Both can have their own styles.
@@ -114,7 +116,7 @@ export const debug = new DebugWeb({
 Creates a proxy with aliases and custom level support.
 
 ```typescript
-<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
+<T extends typeof DebugWeb>(options?: CreateDebugOptions, DebugClass?: T) => CustomLogLevels & InstanceType<T>;
 ```
 
 #### Logging methods
@@ -145,7 +147,6 @@ Creates a proxy with aliases and custom level support.
 | `set`  | `(data: DebugWebData) => void`                    | Saves debug data (merges)                                            |
 | `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Returns a copy of all data. If `true` is passed, adds helper methods |
 | `dump` | `(keys: string[], options?: DumpOptions) => void` | Outputs data as a table (ignores logging levels)                     |
-
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -187,8 +188,8 @@ Data is accessible via `window[prop]` (default is `debug`).
 Type into the browser console:
 
 ```javascript
-  debug // { error: null, user: {...}, setLevel: f }
-  debug.setLevel() // change logging level
+debug // { error: null, user: {...}, setLevel: f }
+debug.setLevel() // change logging level
 ```
 
 ## Support ❤️
@@ -203,6 +204,7 @@ If you find this library useful, consider supporting its development:
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Links
+
 - [📝 Changelog](CHANGELOG.md)
 - [💻 Source Code](https://github.com/Karlen-ll/debug-web)
 - [🐛 Bug Reports](https://github.com/Karlen-ll/debug-web/issues)

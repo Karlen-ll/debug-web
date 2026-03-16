@@ -4,6 +4,7 @@ NPM-Paket für das Debugging im Browser mit anpassbaren Protokollierungsebenen (
 Leichtgewichtig und einfach zu bedienen.
 
 **Eigenschaften**:
+
 - 🚀 **Keine Abhängigkeiten** — reines TypeScript;
 - 📦 **Größe ~3.5 kB** — minimaler Einfluss auf Ihr Bundle;
 - 🏅 **SonarQube `A` Bewertung** — höchstes Maß an Codequalität und Zuverlässigkeit;
@@ -49,10 +50,12 @@ Priorität (niedrig nach hoch):
 1. `debug` (0) — Debug-Informationen (`console.debug`);
 2. `log` (1) — Grundlegende Nachrichten (`console.log`);
 3. `info` (2) — Informationelle Nachrichten (`console.info`);
-4. `warn` (3) —  Warnungen (`console.warn`);
+4. `warn` (3) — Warnungen (`console.warn`);
 5. `error` (4) — Fehler (`console.error`).
 
-ℹ️ Benutzerdefinierte Ebenen: beliebige Zeichenfolgen (z.B. `success`, `focus`) werden mit spezifischem Verhalten verarbeitet:
+ℹ️ Benutzerdefinierte Ebenen: beliebige Zeichenfolgen (z.B. `success`, `focus`) werden mit spezifischem Verhalten
+verarbeitet:
+
 - Reguläre benutzerdefinierte Ebenen (ohne Unterstrich-Präfix) verwenden die `info`-Ebene
 - Ebenen, die mit Unterstrich beginnen (z.B. `_info`, `_error`), verwenden die `debug`-Ebene
   Beide können eigene Stile haben.
@@ -114,7 +117,7 @@ export const debug = new DebugWeb({
 Erstellt einen Proxy mit Aliasen und Unterstützung für benutzerdefinierte Ebenen.
 
 ```typescript
-<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
+<T extends typeof DebugWeb>(options?: CreateDebugOptions, DebugClass?: T) => CustomLogLevels & InstanceType<T>;
 ```
 
 #### Protokollierungsmethoden
@@ -145,7 +148,6 @@ Erstellt einen Proxy mit Aliasen und Unterstützung für benutzerdefinierte Eben
 | `set`   | `(data: DebugWebData) => void`                    | Speichert Debug-Daten (zusammenführen)                                          |
 | `get`   | `(api?: boolean) => DebugWebData  \| undefined`   | Gibt eine Kopie aller Daten zurück. Bei `true` werden Hilfsmethoden hinzugefügt |
 | `dump`  | `(keys: string[], options?: DumpOptions) => void` | Gibt Daten als Tabelle aus (ignoriert Protokollierungsebenen)                   |
-
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -187,8 +189,8 @@ Daten sind über `window[prop]` (Standard ist `debug`) zugänglich.
 Geben Sie in der Browserkonsole ein:
 
 ```javascript
-  debug // { error: null, user: {...}, setLevel: f }
-  debug.setLevel() // Protokollierungsebene ändern
+debug // { error: null, user: {...}, setLevel: f }
+debug.setLevel() // Protokollierungsebene ändern
 ```
 
 ## Unterstützung ❤️
@@ -203,6 +205,7 @@ Wenn diese Bibliothek für Sie nützlich ist, ziehen Sie bitte in Betracht, ihre
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Links
+
 - [📝 Änderungsprotokoll](CHANGELOG.md)
 - [💻 Quellcode](https://github.com/Karlen-ll/debug-web)
 - [🐛 Fehlermeldungen](https://github.com/Karlen-ll/debug-web/issues)

@@ -4,6 +4,7 @@ NPM-пакет для отладки в браузере с настраивае
 Легковесный и простой в использовании.
 
 **Преимущества**:
+
 - 🚀 **Нет зависимостей** — только чистый TypeScript;
 - 📦 **Вес ~3.5 kB** — минимальное влияние на бандл;
 - 🏅 **Рейтинг SonarQube `A`** — высший уровень качества кода и надёжности;
@@ -53,6 +54,7 @@ yarn add debug-web
 5. `error` (4) — ошибки (`console.error`)
 
 ℹ️ Пользовательские уровни: любые строковые значения (например, `success`, `focus`) обрабатываются особым образом:
+
 - Обычные пользовательские уровни (без префикса подчеркивания) используют уровень `info`
 - Уровни, начинающиеся с подчеркивания (например, `_info`, `_error`), используют уровень `debug`
   Оба типа могут иметь собственные стили.
@@ -114,7 +116,7 @@ export const debug = new DebugWeb({
 Создаёт прокси с алиасами и поддержкой кастомных уровней.
 
 ```typescript
-<T extends typeof DebugWeb>( options?: CreateDebugOptions, DebugClass?: T ) => CustomLogLevels & InstanceType<T>;
+<T extends typeof DebugWeb>(options?: CreateDebugOptions, DebugClass?: T) => CustomLogLevels & InstanceType<T>;
 ```
 
 #### Методы логирования
@@ -145,7 +147,6 @@ export const debug = new DebugWeb({
 | `set`  | `(data: DebugWebData) => void`                    | Сохраняет отладочные данные (объединяет)                                              |
 | `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Возвращает копию всех данных. Если передать `true` — добавляет вспомогательные методы |
 | `dump` | `(keys: string[], options?: DumpOptions) => void` | Выводит данные в виде таблицы (игнорирует уровни логирования)                         |
-
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -187,8 +188,8 @@ debug.set({ error: null, user: { id: 1, name: 'John' } });
 Введите в консоль браузера:
 
 ```javascript
-  debug // { error: null, user: {...}, setLevel: f }
-  debug.setLevel() // изменить уровень логирования
+debug // { error: null, user: {...}, setLevel: f }
+debug.setLevel() // изменить уровень логирования
 ```
 
 ## Поддержка ❤️
@@ -203,6 +204,7 @@ debug.set({ error: null, user: { id: 1, name: 'John' } });
 MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Ссылки
+
 - [📝 История изменений](CHANGELOG.md)
 - [💻 Исходный код](https://github.com/Karlen-ll/debug-web)
 - [🐛 Отчеты об ошибках](https://github.com/Karlen-ll/debug-web/issues)
