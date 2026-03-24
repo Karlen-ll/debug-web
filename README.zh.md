@@ -5,27 +5,27 @@
 
 **特点**:
 
-- 🚀 **无依赖** — 纯 TypeScript 编写；
-- 📦 **体积 ~3.5 kB** — 对打包体积影响极小；
-- 🏅 **SonarQube `A` 评级** — 最高级别的代码质量和可靠性；
-- 🎨 **控制台输出样式** — 彩色格式化，便于快速识别；
-- 💾 **全局存储** — 通过 `window` 访问调试数据；
-- 🔧 **灵活配置** — 支持日志级别、样式、别名及继承。
+- **无依赖** — 纯 TypeScript 编写；
+- **体积 ~3.5 kB** — 对打包体积影响极小；
+- **SonarQube `A` 评级** — 最高级别的代码质量和可靠性；
+- **控制台输出样式** — 彩色格式化，便于快速识别；
+- **全局存储** — 通过 `window` 访问调试数据；
+- **灵活配置** — 支持日志级别、样式、别名及继承。
 
 ---
 
-## 目录 📑
+## 目录
 
-- [安装](#安装-)
-- [日志级别](#日志级别-)
-- [选项](#选项-)
-- [API](#api-)
+- [安装](#安装)
+- [日志级别](#日志级别)
+- [选项](#选项)
+- [API](#api)
   - [createDebug](#createdebug-函数)
   - [日志记录方法](#日志记录方法)
   - [数据处理](#数据处理)
   - [级别管理](#级别管理)
 - [调试数据](#调试数据)
-- [支持](#支持-)
+- [支持](#支持)
 - [许可证](#许可证)
 
 ## 翻译版本
@@ -34,7 +34,7 @@
 
 ---
 
-## 安装 📦
+## 安装
 
 ```bash
 npm install debug-web
@@ -43,7 +43,7 @@ npm install debug-web
 yarn add debug-web
 ```
 
-## 日志级别 🔧
+## 日志级别
 
 优先级（从低到高）：
 
@@ -59,7 +59,7 @@ yarn add debug-web
 - 以下划线开头的级别（例如 `_info`、`_error`）使用 `debug` 级别
   两者都可以有自己的样式。
 
-## 选项 ⚙️
+## 选项
 
 | 参数       | 类型                              | 默认值            | 描述                                              |
 |----------|---------------------------------|----------------|-------------------------------------------------|
@@ -69,15 +69,15 @@ yarn add debug-web
 | `data`   | `Record<string, unknown>`       | —              | 初始调试数据                                          |
 | `local`  | `boolean`                       | `false`        | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
 | `native` | `boolean`                       | `false`        | 使用原生控制台方法（不带样式）                                 |
-| `alias`  | `Record<string, DebugLogLevel>` | `{}`           | `createDebug` 的自定义别名                            |
 | `title`  | `Record<string, string>`        | `undefined`    | 自定义日志级别的标题                                      |
-| `style`  | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式-) | 日志级别的 CSS 样式                                    |
+| `alias`  | `Record<string, DebugLogLevel>` | 见 [下方](#默认别名)  | `createDebug` 的自定义别名                            |
+| `style`  | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式)  | 日志级别的 CSS 样式                                    |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 ```
 
-### 默认样式 🎨
+### 默认样式
 
 | 级别        | 样式 (CSS)                                                                   |
 |-----------|----------------------------------------------------------------------------|
@@ -92,7 +92,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 
 `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
-## 如何使用 💡
+## 如何使用
 
 ### 创建实例
 
@@ -109,7 +109,7 @@ export const debug = new DebugWeb({
 });
 ```
 
-### API 📚
+### API
 
 #### `createDebug` 函数
 
@@ -192,7 +192,7 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // 修改日志级别
 ```
 
-## 支持 ❤️
+## 支持
 
 如果这个库对您有帮助，请考虑支持它的开发。
 

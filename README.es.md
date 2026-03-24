@@ -5,27 +5,27 @@ Ligero y fácil de usar.
 
 **Características**:
 
-- 🚀 **Sin dependencias** — solo TypeScript puro;
-- 📦 **Peso ~3.5 kB** — impacto mínimo en tu bundle;
-- 🏅 **Calificación SonarQube `A`** — el nivel más alto de calidad y confiabilidad de código;
-- 🎨 **Estilización de consola** — formato de colores para una identificación rápida;
-- 💾 **Almacenamiento global** — acceso a los datos de depuración a través de `window`;
-- 🔧 **Configuración flexible** — niveles de registro, estilos, alias, soporte para herencia.
+- **Sin dependencias** — solo TypeScript puro;
+- **Peso ~3.5 kB** — impacto mínimo en tu bundle;
+- **Calificación SonarQube `A`** — el nivel más alto de calidad y confiabilidad de código;
+- **Estilización de consola** — formato de colores para una identificación rápida;
+- **Almacenamiento global** — acceso a los datos de depuración a través de `window`;
+- **Configuración flexible** — niveles de registro, estilos, alias, soporte para herencia.
 
 ---
 
-## Tabla de contenidos 📑
+## Tabla de contenidos
 
-- [Instalación](#instalación-)
-- [Niveles de registro](#niveles-de-registro-)
-- [Opciones](#opciones-)
-- [API](#api-)
+- [Instalación](#instalación)
+- [Niveles de registro](#niveles-de-registro)
+- [Opciones](#opciones)
+- [API](#api)
   - [createDebug](#función-createdebug)
   - [Métodos de registro](#métodos-de-registro)
   - [Manejo de datos](#manejo-de-datos)
   - [Gestión de niveles](#gestión-de-niveles)
 - [Datos de depuración](#datos-de-depuración)
-- [Soporte](#soporte-)
+- [Soporte](#soporte)
 - [Licencia](#licencia)
 
 ## Traducciones
@@ -34,7 +34,7 @@ Ligero y fácil de usar.
 
 ---
 
-## Instalación 📦
+## Instalación
 
 ```bash
 npm install debug-web
@@ -43,7 +43,7 @@ npm install debug-web
 yarn add debug-web
 ```
 
-## Niveles de registro 🔧
+## Niveles de registro
 
 Prioridad (de menor a mayor):
 
@@ -60,25 +60,25 @@ comportamiento específico:
 - Los niveles que comienzan con guión bajo (por ejemplo, `_info`, `_error`) utilizan el nivel `debug`
   Ambos pueden tener sus propios estilos.
 
-## Opciones ⚙️
+## Opciones
 
-| Parámetro | Tipo                            | Por defecto                        | Descripción                                                                 |
-|-----------|---------------------------------|------------------------------------|-----------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'_debug_web'`                     | Nombre único de la aplicación para separar datos                            |
-| `level`   | `DebugLogLevel`                 | `'log'`                            | Nivel mínimo de registro (no se muestran mensajes por debajo de este nivel) |
-| `prop`    | `string` \| `null`              | `'debug'`                          | Nombre de variable global para acceder a datos (`null` — no crear)          |
-| `data`    | `Record<string, unknown>`       | —                                  | Datos iniciales de depuración                                               |
-| `local`   | `boolean`                       | `false`                            | Guardar el nivel en `localStorage` (de lo contrario en `sessionStorage`)    |
-| `native`  | `boolean`                       | `false`                            | Usar métodos nativos de la consola (sin estilos)                            |
-| `alias`   | `Record<string, DebugLogLevel>` | `{}`                               | Alias personalizados para `createDebug`                                     |
-| `title`   | `Record<string, string>`        | `undefined`                        | Títulos para niveles de registro personalizados                             |
-| `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto-) | Estilos CSS para los niveles de registro                                    |
+| Parámetro | Tipo                            | Por defecto                       | Descripción                                                                 |
+|-----------|---------------------------------|-----------------------------------|-----------------------------------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'`                    | Nombre único de la aplicación para separar datos                            |
+| `level`   | `DebugLogLevel`                 | `'log'`                           | Nivel mínimo de registro (no se muestran mensajes por debajo de este nivel) |
+| `prop`    | `string` \| `null`              | `'debug'`                         | Nombre de variable global para acceder a datos (`null` — no crear)          |
+| `data`    | `Record<string, unknown>`       | —                                 | Datos iniciales de depuración                                               |
+| `local`   | `boolean`                       | `false`                           | Guardar el nivel en `localStorage` (de lo contrario en `sessionStorage`)    |
+| `native`  | `boolean`                       | `false`                           | Usar métodos nativos de la consola (sin estilos)                            |
+| `title`   | `Record<string, string>`        | `undefined`                       | Títulos para niveles de registro personalizados                             |
+| `alias`   | `Record<string, DebugLogLevel>` | ver [abajo](#alias-por-defecto)   | Alias personalizados para `createDebug`                                     |
+| `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto) | Estilos CSS para los niveles de registro                                    |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 ```
 
-### Estilos por defecto 🎨
+### Estilos por defecto
 
 | Nivel     | Estilo (CSS)                                                               |
 |-----------|----------------------------------------------------------------------------|
@@ -93,7 +93,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 
 `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
-## Cómo usar 💡
+## Cómo usar
 
 ### Crear una instancia
 
@@ -110,7 +110,7 @@ export const debug = new DebugWeb({
 });
 ```
 
-### API 📚
+### API
 
 #### Función `createDebug`
 
@@ -193,7 +193,7 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // cambiar el nivel de registro
 ```
 
-## Soporte ❤️
+## Soporte
 
 Si esta biblioteca te resulta útil, considera apoyar su desarrollo:
 

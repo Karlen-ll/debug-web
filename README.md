@@ -5,27 +5,27 @@ Lightweight and easy to use.
 
 **Features**:
 
-- 🚀 **No dependencies** — pure TypeScript only;
-- 📦 **Size ~3.5 kB** — minimal impact on your bundle;
-- 🏅 **SonarQube `A` Rating** — highest level of code quality and reliability;
-- 🎨 **Console output styling** — color formatting for quick identification;
-- 💾 **Global storage** — access debug data via `window`;
-- 🔧 **Flexible configuration** — logging levels, styles, aliases, inheritance support.
+- **No dependencies** — pure TypeScript only;
+- **Size ~3.5 kB** — minimal impact on your bundle;
+- **SonarQube `A` Rating** — highest level of code quality and reliability;
+- **Console output styling** — color formatting for quick identification;
+- **Global storage** — access debug data via `window`;
+- **Flexible configuration** — logging levels, styles, aliases, inheritance support.
 
 ---
 
-## Table of Contents 📑
+## Table of Contents
 
-- [Installation](#installation-)
-- [Log levels](#log-levels-)
-- [Options](#options-)
-- [API](#api-)
+- [Installation](#installation)
+- [Log levels](#log-levels)
+- [Options](#options)
+- [API](#api)
   - [createDebug](#createdebug-function)
   - [Logging methods](#logging-methods)
   - [Data handling](#data-handling)
   - [Level management](#level-management)
 - [Debug data](#debug-data)
-- [Support](#support-)
+- [Support](#support)
 - [License](#license)
 
 ## Languages
@@ -34,7 +34,7 @@ Lightweight and easy to use.
 
 ---
 
-## Installation 📦
+## Installation
 
 ```bash
 npm install debug-web
@@ -43,7 +43,7 @@ npm install debug-web
 yarn add debug-web
 ```
 
-## Log Levels 🔧
+## Log Levels
 
 Priority (from lowest to highest):
 
@@ -59,7 +59,7 @@ Priority (from lowest to highest):
 - Levels starting with underscore (e.g., `_info`, `_error`) use the `debug` level
   Both can have their own styles.
 
-## Options ⚙️
+## Options
 
 | Parameter | Type                            | Default                       | Description                                                      |
 |-----------|---------------------------------|-------------------------------|------------------------------------------------------------------|
@@ -69,15 +69,15 @@ Priority (from lowest to highest):
 | `data`    | `Record<string, unknown>`       | —                             | Initial debug data                                               |
 | `local`   | `boolean`                       | `false`                       | Save level in `localStorage` (otherwise `sessionStorage`)        |
 | `native`  | `boolean`                       | `false`                       | Use native console methods (without styles)                      |
-| `alias`   | `Record<string, DebugLogLevel>` | `{}`                          | Custom aliases for `createDebug`                                 |
 | `title`   | `Record<string, string>`        | `undefined`                   | Titles for custom log levels                                     |
-| `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles-) | CSS styles for log levels                                        |
+| `alias`   | `Record<string, DebugLogLevel>` | see [below](#default-aliases) | Custom aliases for `createDebug`                                 |
+| `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles)  | CSS styles for log levels                                        |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 ```
 
-### Default styles 🎨
+### Default styles
 
 | Level     | Style (CSS)                                                                |
 |-----------|----------------------------------------------------------------------------|
@@ -92,7 +92,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 
 `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
-## How to use 💡
+## How to use
 
 ### Creating an instance
 
@@ -109,7 +109,7 @@ export const debug = new DebugWeb({
 });
 ```
 
-### API 📚
+### API
 
 #### `createDebug` function
 
@@ -192,7 +192,7 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // change logging level
 ```
 
-## Support ❤️
+## Support
 
 If you find this library useful, consider supporting its development:
 

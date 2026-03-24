@@ -5,27 +5,27 @@ Leichtgewichtig und einfach zu bedienen.
 
 **Eigenschaften**:
 
-- 🚀 **Keine Abhängigkeiten** — reines TypeScript;
-- 📦 **Größe ~3.5 kB** — minimaler Einfluss auf Ihr Bundle;
-- 🏅 **SonarQube `A` Bewertung** — höchstes Maß an Codequalität und Zuverlässigkeit;
-- 🎨 **Konsolen-Styling** — farbliche Formatierung zur schnellen Identifikation;
-- 💾 **Globaler Speicher** — Zugriff auf Debug-Daten über `window`;
-- 🔧 **Flexible Konfiguration** — Protokollierungsebenen, Stile, Aliase, Unterstützung von Vererbung.
+- **Keine Abhängigkeiten** — reines TypeScript;
+- **Größe ~3.5 kB** — minimaler Einfluss auf Ihr Bundle;
+- **SonarQube `A` Bewertung** — höchstes Maß an Codequalität und Zuverlässigkeit;
+- **Konsolen-Styling** — farbliche Formatierung zur schnellen Identifikation;
+- **Globaler Speicher** — Zugriff auf Debug-Daten über `window`;
+- **Flexible Konfiguration** — Protokollierungsebenen, Stile, Aliase, Unterstützung von Vererbung.
 
 ---
 
-## Inhaltsverzeichnis 📑
+## Inhaltsverzeichnis
 
-- [Installation](#installation-)
-- [Protokollierungsebenen](#protokollierungsebenen-)
-- [Optionen](#optionen-)
-- [API](#api-)
+- [Installation](#installation)
+- [Protokollierungsebenen](#protokollierungsebenen)
+- [Optionen](#optionen)
+- [API](#api)
   - [createDebug](#funktion-createdebug)
   - [Protokollierungsmethoden](#protokollierungsmethoden)
   - [Datenverarbeitung](#datenverarbeitung)
   - [Ebenenverwaltung](#ebenenverwaltung)
 - [Debug-Daten](#debug-daten)
-- [Unterstützung](#unterstützung-)
+- [Unterstützung](#unterstützung)
 - [Lizenz](#lizenz)
 
 ## Übersetzungen
@@ -34,7 +34,7 @@ Leichtgewichtig und einfach zu bedienen.
 
 ---
 
-## Installation 📦
+## Installation
 
 ```bash
 npm install debug-web
@@ -43,7 +43,7 @@ npm install debug-web
 yarn add debug-web
 ```
 
-## Protokollierungsebenen 🔧
+## Protokollierungsebenen
 
 Priorität (niedrig nach hoch):
 
@@ -60,25 +60,25 @@ verarbeitet:
 - Ebenen, die mit Unterstrich beginnen (z.B. `_info`, `_error`), verwenden die `debug`-Ebene
   Beide können eigene Stile haben.
 
-## Optionen ⚙️
+## Optionen
 
-| Parameter | Typ                             | Standard                       | Beschreibung                                                                 |
-|-----------|---------------------------------|--------------------------------|------------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'_debug_web'`                 | Eindeutiger App-Name zur Trennung von Daten                                  |
-| `level`   | `DebugLogLevel`                 | `'log'`                        | Minimale Protokollierungsebene (Nachrichten darunter werden nicht angezeigt) |
-| `prop`    | `string` \| `null`              | `'debug'`                      | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
-| `data`    | `Record<string, unknown>`       | —                              | Initiale Debug-Daten                                                         |
-| `local`   | `boolean`                       | `false`                        | Ebene in `localStorage` speichern (sonst `sessionStorage`)                   |
-| `native`  | `boolean`                       | `false`                        | Native Konsolenmethoden (ohne Stile) verwenden                               |
-| `alias`   | `Record<string, DebugLogLevel>` | `{}`                           | Benutzerdefinierte Aliase für `createDebug`                                  |
-| `title`   | `Record<string, string>`        | `undefined`                    | Titel für benutzerdefinierte Protokollierungsebenen                          |
-| `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile-) | CSS-Stile für die Protokollierungsebenen                                     |
+| Parameter | Typ                             | Standard                        | Beschreibung                                                                 |
+|-----------|---------------------------------|---------------------------------|------------------------------------------------------------------------------|
+| `app`     | `string` \| `null`              | `'_debug_web'`                  | Eindeutiger App-Name zur Trennung von Daten                                  |
+| `level`   | `DebugLogLevel`                 | `'log'`                         | Minimale Protokollierungsebene (Nachrichten darunter werden nicht angezeigt) |
+| `prop`    | `string` \| `null`              | `'debug'`                       | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
+| `data`    | `Record<string, unknown>`       | —                               | Initiale Debug-Daten                                                         |
+| `local`   | `boolean`                       | `false`                         | Ebene in `localStorage` speichern (sonst `sessionStorage`)                   |
+| `native`  | `boolean`                       | `false`                         | Native Konsolenmethoden (ohne Stile) verwenden                               |
+| `title`   | `Record<string, string>`        | `undefined`                     | Titel für benutzerdefinierte Protokollierungsebenen                          |
+| `alias`   | `Record<string, DebugLogLevel>` | siehe [unten](#standard-aliase) | Benutzerdefinierte Aliase für `createDebug`                                  |
+| `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile)   | CSS-Stile für die Protokollierungsebenen                                     |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
 ```
 
-### Standardstile 🎨
+### Standardstile
 
 | Ebene     | Stil (CSS)                                                                 |
 |-----------|----------------------------------------------------------------------------|
@@ -93,7 +93,7 @@ type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | s
 
 `d` → `debug`, `l` → `log`, `i` → `info`, `w` → `warn`, `e` → `error`
 
-## Verwendung 💡
+## Verwendung
 
 ### Erstellen einer Instanz
 
@@ -110,7 +110,7 @@ export const debug = new DebugWeb({
 });
 ```
 
-### API 📚
+### API
 
 #### Funktion `createDebug`
 
@@ -193,7 +193,7 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // Protokollierungsebene ändern
 ```
 
-## Unterstützung ❤️
+## Unterstützung
 
 Wenn diese Bibliothek für Sie nützlich ist, ziehen Sie bitte in Betracht, ihre Entwicklung zu unterstützen:
 
