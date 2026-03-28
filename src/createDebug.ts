@@ -9,8 +9,8 @@ export function createDebug<T extends typeof DebugWeb>(
   DebugClass: T = DebugWeb as T
 ) {
   const instance = new DebugClass(options);
-  const aliasMap: DebugWebAliasMap = { ...DEFAULT_ALIAS_MAP, ...options?.alias };
-  const titleMap: DebugWebTitleMap = { ...options?.title };
+  const aliasMap: DebugWebAliasMap = { ...DEFAULT_ALIAS_MAP, ...(options ? options.alias : undefined) };
+  const titleMap: DebugWebTitleMap = { ...(options ? options.title : undefined) };
 
   return new Proxy(instance, {
     get(target, name: string) {

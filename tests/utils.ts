@@ -9,10 +9,10 @@ export class TestDebugWeb extends DebugWeb {
 
   reset(options?: DebugWebOptions) {
     if (!isSSR()) {
-      delete window[getWindowKey(this._app)];
+      delete window[getWindowKey(this._id)];
 
-      if (this._prop) {
-        delete window[getWindowKey(this._prop, true)];
+      if (this._prp) {
+        delete window[getWindowKey(this._prp, true)];
       }
     }
 

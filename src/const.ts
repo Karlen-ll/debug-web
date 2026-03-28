@@ -6,6 +6,7 @@ export const INFO = 'info';
 export const DEBUG = 'debug';
 export const WARN = 'warn';
 export const ERROR = 'error';
+export const TABLE = 'table';
 
 /** Default level priority map for filtering console output */
 export const DEFAULT_LVL_MAP = { [DEBUG]: 0, [LOG]: 1, [INFO]: 2, [WARN]: 3, [ERROR]: 4 };

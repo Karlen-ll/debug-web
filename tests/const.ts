@@ -5,7 +5,7 @@ export const CONSOLE_METHODS = [
   'group', 'groupCollapsed', 'groupEnd', 'time', 'timeLog', 'timeEnd', 'trace'
 ] as const;
 
-export const DEFAULT_APP_NAME = getWindowKey('_debug_web');
+export const DEFAULT_APP_NAME = getWindowKey('debug');
 export const DEFAULT_PROP_NAME = 'debug' as const;
 
 export const TEST_RAW_APP_NAME = 'core' as const;

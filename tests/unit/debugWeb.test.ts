@@ -14,7 +14,7 @@ import {
   TEST_PROP_NAME,
 } from '../const';
 import { DEFAULT_STYLE } from '@/const';
-import type { DebugWebOptions } from '@/types';
+import type { DebugWebOnLog, DebugWebOptions } from '@/types';
 
 describe('DebugWeb', () => {
   const debug = createDebug(undefined, TestDebugWeb);
@@ -237,6 +237,31 @@ describe('DebugWeb', () => {
       reset({ level: 'log' });
       debug.level ='error';
       expect(debug.level).toEqual('error');
+    });
+  });
+
+  describe('onLog callback', () => {
+    let mockOnLog: DebugWebOnLog;
+
+    beforeEach(() => {
+      mockOnLog = vi.fn() as DebugWebOnLog;
+      reset({ onLog: mockOnLog });
+    });
+
+    it('calls onLog', () => {
+      debug.log(TEST_MESSAGE);
+
+      expect(mockOnLog).toHaveBeenCalledWith('log', [TEST_MESSAGE]);
+    });
+
+
+    it('works without onLog', () => {
+      reset({ onLog: undefined });
+
+      expect(() => {
+        debug.log(TEST_MESSAGE);
+        debug.error(TEST_MESSAGE);
+      }).not.toThrow();
     });
   });
 

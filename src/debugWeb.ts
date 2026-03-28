@@ -1,28 +1,56 @@
-import { stylizeAttrs } from './stylize';
 import {
   isSSR,
   isFunc,
   isDefined,
   getArray,
+  stringify,
   getWindowKey,
   getGroupMethod,
-  getStoredLvl,
-  setStoredLvl,
+  getStoredValue,
+  setStoredValue,
+  getStoredObject,
+  defineWindowProperty,
 } from '@/utils';
-import { DEFAULT_LVL_MAP, DEBUG, LOG, INFO, WARN, ERROR, DEFAULT_STYLE } from '@/const';
-import type { ConsoleMethod, DebugWebData, DebugWebLogLevel, DebugWebOptions, DebugWebStyle } from '@/types';
+import { stylizeAttrs } from './stylize';
+import { DEFAULT_LVL_MAP, DEBUG, LOG, INFO, WARN, ERROR, TABLE, DEFAULT_STYLE } from '@/const';
+import { ConsoleMethod, DebugWebData, DebugWebStyle, DebugWebOptions, DebugWebLogLevel, DebugWebOnLog } from '@/types';
 
 /** Class for centralized collection and output of debugging information */
 export class DebugWeb {
+  /** App identifier */
+  declare protected _id: string;
+
+  /** Level
+   * @desc Current log level */
   declare protected _lvl: DebugWebLogLevel;
-  declare protected _app: string;
-  declare protected _prop: string | null;
-  declare protected _style: DebugWebStyle;
-  declare protected _native?: boolean;
-  declare protected _local?: boolean;
+
+  /** Prop
+   * @desc Window property name */
+  declare protected _prp: string | null;
+
+  /** Style
+   * @desc CSS styles by level */
+  declare protected _stl: DebugWebStyle;
+
+  /** Native
+   * @desc Use native console */
+  declare protected _ntv?: boolean;
+
+  /** Use localStorage (vs session) */
+  declare protected _ls?: boolean;
+
+  /** Log callback */
+  declare protected _on?: DebugWebOnLog;
 
   /** Log levels mapping */
   declare protected _map: Partial<Record<DebugWebLogLevel, number>>;
+
+  /** Window instance key */
+  declare protected __w: keyof Window;
+
+  /** Storage key for level
+   * @desc For the data uses the _id key  */
+  declare protected __s: string;
 
   constructor(options?: DebugWebOptions) {
     this.init(options);
@@ -31,9 +59,11 @@ export class DebugWeb {
 
   /** Create window property for data access */
   attach() {
-    if (!this._prop || isSSR()) return;
+    if (!this._prp || isSSR()) return;
 
-    Object.defineProperty(window, this._prop, { get: () => this.get(true), configurable: true });
+    defineWindowProperty(this._prp, {
+      get: () => ({ ...this.get(), setLevel: this.setLvl.bind(this) })
+    });
   }
 
   /** Output message to Web console */
@@ -98,7 +128,7 @@ export class DebugWeb {
 
   /** Output a table */
   table(data: unknown, properties?: string[]) {
-    this.call('table', [data, properties]);
+    this.call(TABLE, [data, properties]);
   }
 
   /** Start timer for execution time measurement */
@@ -117,19 +147,29 @@ export class DebugWeb {
   }
 
   /** Update debugging data */
-  set(data: DebugWebData) {
-    if (isSSR()) return;
+  set(data?: DebugWebData, storage?: boolean) {
+    if (!data || isSSR()) return;
 
-    const storageName = getWindowKey(this._app);
-    const value = Object.assign(window[storageName] || {}, data);
+    const value: DebugWebData = Object.assign(storage ? getStoredObject(this._id) : window[this.__w] || {}, data);
 
-    Object.keys(value).forEach(key => {
+    for (const key in value) {
       if (value[key] === undefined) {
         delete value[key];
       }
-    });
+    }
 
-    Object.defineProperty(window, storageName, { value, writable: true, enumerable: false, configurable: true });
+    if (storage) {
+      setStoredValue(this._id, stringify(value));
+    } else {
+      defineWindowProperty(this.__w, { value, writable: true });
+    }
+  }
+
+  /** Get all collected debugging data */
+  get(storage?: boolean) {
+    if (isSSR()) return;
+
+    return (storage ? getStoredObject(this._id) : window[this.__w]) as DebugWebData | undefined;
   }
 
   /** Persist log level */
@@ -144,25 +184,12 @@ export class DebugWeb {
 
   /** Get styles map by logging level */
   get style(): DebugWebStyle {
-    return this._style;
+    return this._stl;
   }
 
   /** Update styles map by logging level or entirely */
   set style(style: DebugWebStyle) {
-    Object.assign(this._style, style);
-  }
-
-  /** Get all collected debugging data */
-  get(api?: boolean) {
-    if (isSSR()) return;
-
-    const data = { ...window[getWindowKey(this._app)] } as DebugWebData;
-
-    if (api) {
-      data.setLevel = this.setLvl.bind(this);
-    }
-
-    return data;
+    Object.assign(this._stl, style);
   }
 
   /** Display a formatted dump of debugging data by selected keys
@@ -181,24 +208,25 @@ export class DebugWeb {
     open?: boolean
   }) {
     const data = this.get();
+    const level = options ? options.level : undefined;
 
     if (!data || !keys.length) return;
-    const isSimple = !options?.title;
+    const isSimple = !(options && options.title);
 
     this.call(
-      getGroupMethod(options?.open),
+      getGroupMethod(options && options.open),
       [isSimple ? data[keys[0]] || keys[0] : isFunc(options.title) ? options.title(data) : options.title],
-      options?.level,
+      level,
       true,
       true
     );
 
-    if (options?.hint) {
-      this.call('log', options.hint, options.level, false, true);
+    if (options && options.hint) {
+      this.call(LOG, options.hint, options.level, false, true);
     }
 
     this.call(
-      'table',
+      TABLE,
       [keys.reduce<DebugWebData>((acc, key, index) => {
         if (!(isSimple && index === 0) && isDefined(data[key])) {
           acc[key] = data[key];
@@ -206,12 +234,12 @@ export class DebugWeb {
 
         return acc;
       }, {})],
-      options?.level,
+      level,
       false,
       true
     );
 
-    this.call('groupEnd', [], options?.level, false, true);
+    this.call('groupEnd', [], level, false, true);
   }
 
   /** Core method for logging with level filtering and formatting
@@ -230,24 +258,27 @@ export class DebugWeb {
       return;
     }
 
-    this.print(method, getArray(attrs), level, stylize ? !this._native : false);
+    this.print(method, getArray(attrs), level, stylize ? !this._ntv : false);
   }
 
   /** Configure instance */
   protected init(options?: DebugWebOptions) {
-    this._app = options?.app || '_debug_web';
-    this._prop = isDefined(options?.prop) ? options.prop : 'debug';
+    this._id = options && options.app || DEBUG;
+    this._prp = options && isDefined(options.prop) ? options.prop : DEBUG;
+    this._map = { ...DEFAULT_LVL_MAP };
 
-    this._map = DEFAULT_LVL_MAP;
-    this._local = options?.local;
-    this._native = options?.native;
+    this.__w = getWindowKey(this._id);
+    this.__s = this._id + ':level';
 
-    this._lvl = getStoredLvl(this._app, this._local) || options?.level || LOG;
-    this._style = { ...DEFAULT_STYLE, ...options?.style };
-
-    if (options?.data) {
+    if (options) {
+      this._ls = options.local;
+      this._ntv = options.native;
+      this._on = options.onLog;
       this.set(options.data);
     }
+
+    this._lvl = getStoredValue(this.__s, this._ls) || options && options.level || LOG;
+    this._stl = { ...DEFAULT_STYLE, ...(options ? options.style : undefined) };
   }
 
   /** Get logging level priority number */
@@ -258,17 +289,17 @@ export class DebugWeb {
   }
 
   /** Set log level and persist to storage for browser debugging
-   * @param level - Target log level or true to reset to default ('log')
-   */
+   * @param level - Target log level or true to reset to default ('log') */
   protected setLvl(level: DebugWebLogLevel | true = true) {
     this._lvl = level === true ? LOG : level;
-    setStoredLvl(this._app, this._lvl, this._local);
+    setStoredValue(this.__s, this._lvl, this._ls);
   }
 
   /** Format and output data using specified console method and level styling */
   protected print(method: ConsoleMethod, attrs: unknown[], level: DebugWebLogLevel = INFO, stylize?: boolean) {
-    const args = stylize ? stylizeAttrs(attrs, this._style[level]) : attrs;
+    const args = stylize ? stylizeAttrs(attrs, this._stl[level]) : attrs;
 
     console[method](...args as never[]);
+    if (this._on) this._on(level, attrs);
   }
 }

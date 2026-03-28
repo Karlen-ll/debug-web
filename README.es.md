@@ -64,7 +64,7 @@ comportamiento específico:
 
 | Parámetro | Tipo                            | Por defecto                       | Descripción                                                                 |
 |-----------|---------------------------------|-----------------------------------|-----------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'_debug_web'`                    | Nombre único de la aplicación para separar datos                            |
+| `app`     | `string` \| `null`              | `'debug'`                    | Nombre único de la aplicación para separar datos                            |
 | `level`   | `DebugLogLevel`                 | `'log'`                           | Nivel mínimo de registro (no se muestran mensajes por debajo de este nivel) |
 | `prop`    | `string` \| `null`              | `'debug'`                         | Nombre de variable global para acceder a datos (`null` — no crear)          |
 | `data`    | `Record<string, unknown>`       | —                                 | Datos iniciales de depuración                                               |

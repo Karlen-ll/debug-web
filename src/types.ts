@@ -2,10 +2,12 @@ export type DebugWebLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | '
 
 export type DebugWebData = Record<string, unknown>
 export type DebugWebStyle = Partial<Record<DebugWebLogLevel, string | undefined>>
+export type DebugWebOnLog = (level: DebugWebLogLevel, attrs: unknown[]) => void;
 
 export interface DebugWebOptions {
   /** Unique application name
-   * @desc Required to separate data of different applications in the same environment */
+   * @desc Required to separate data of different applications in the same environment
+   * @default 'debug' */
   app?: string | null;
 
   /** Allowed logging level
@@ -21,6 +23,16 @@ export interface DebugWebOptions {
 
   /** Styles map for different logging levels */
   style?: DebugWebStyle;
+
+  /** Callback function called on each log entry
+   * @param level - Log level of the message
+   * @param attrs - Array of logged arguments
+   * @desc Useful for sending logs to external systems */
+  onLog?: DebugWebOnLog;
+
+  /** Use Storage for data storage instead of window property
+   * @default false */
+  storage?: boolean;
 
   /** Use localStorage instead of sessionStorage
    * @default false */

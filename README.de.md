@@ -64,7 +64,7 @@ verarbeitet:
 
 | Parameter | Typ                             | Standard                        | Beschreibung                                                                 |
 |-----------|---------------------------------|---------------------------------|------------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'_debug_web'`                  | Eindeutiger App-Name zur Trennung von Daten                                  |
+| `app`     | `string` \| `null`              | `'debug'`                       | Eindeutiger App-Name zur Trennung von Daten                                  |
 | `level`   | `DebugLogLevel`                 | `'log'`                         | Minimale Protokollierungsebene (Nachrichten darunter werden nicht angezeigt) |
 | `prop`    | `string` \| `null`              | `'debug'`                       | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
 | `data`    | `Record<string, unknown>`       | —                               | Initiale Debug-Daten                                                         |
