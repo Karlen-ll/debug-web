@@ -63,12 +63,13 @@ Priority (from lowest to highest):
 
 | Parameter | Type                            | Default                       | Description                                                      |
 |-----------|---------------------------------|-------------------------------|------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'debug'`                | Unique application name to separate data                         |
+| `app`     | `string` \| `null`              | `'debug'`                     | Unique application name to separate data                         |
 | `level`   | `DebugLogLevel`                 | `'log'`                       | Minimum logging level (messages below this level are not output) |
 | `prop`    | `string` \| `null`              | `'debug'`                     | Global variable name to access data (`null` — do not create)     |
-| `data`    | `Record<string, unknown>`       | —                             | Initial debug data                                               |
+| `data`    | `Record<string, unknown>`       | `undefined`                   | Initial debug data                                               |
 | `local`   | `boolean`                       | `false`                       | Save level in `localStorage` (otherwise `sessionStorage`)        |
 | `native`  | `boolean`                       | `false`                       | Use native console methods (without styles)                      |
+| `onLog`   | `(level, attrs) => void`        | `undefined`                   | Function called after each log                                   |
 | `title`   | `Record<string, string>`        | `undefined`                   | Titles for custom log levels                                     |
 | `alias`   | `Record<string, DebugLogLevel>` | see [below](#default-aliases) | Custom aliases for `createDebug`                                 |
 | `style`   | `Record<DebugLogLevel, string>` | see [below](#default-styles)  | CSS styles for log levels                                        |
@@ -142,11 +143,11 @@ Creates a proxy with aliases and custom level support.
 
 #### Data handling
 
-| Method | Type                                              | Comment                                                              |
-|--------|---------------------------------------------------|----------------------------------------------------------------------|
-| `set`  | `(data: DebugWebData) => void`                    | Saves debug data (merges)                                            |
-| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Returns a copy of all data. If `true` is passed, adds helper methods |
-| `dump` | `(keys: string[], options?: DumpOptions) => void` | Outputs data as a table (ignores logging levels)                     |
+| Method | Type                                               | Comment                                                                    |
+|--------|----------------------------------------------------|----------------------------------------------------------------------------|
+| `set`  | `(data: DebugWebData, storage?: boolean) => void`  | Saves debug data (merges). If `storage=true` — saves to sessionStorage     |
+| `get`  | `(storage?: boolean) => DebugWebData \| undefined` | Returns a copy of data. If `true` is passed, retrieves from sessionStorage |
+| `dump` | `(keys: string[], options?: DumpOptions) => void`  | Outputs data as a table (ignores logging levels)                           |
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -192,6 +193,11 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // change logging level
 ```
 
+## Examples
+
+- [Saving to file](example/download.ts)
+- [Saving history](example/history.ts)
+
 ## Support
 
 If you find this library useful, consider supporting its development:
@@ -205,7 +211,7 @@ MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Links
 
-- [📝 Changelog](CHANGELOG.md)
-- [💻 Source Code](https://github.com/Karlen-ll/debug-web)
-- [🐛 Bug Reports](https://github.com/Karlen-ll/debug-web/issues)
-- [📦 NPM Package](https://www.npmjs.com/package/debug-web)
+- [Changelog](CHANGELOG.md)
+- [Source Code](https://github.com/Karlen-ll/debug-web)
+- [Bug Reports](https://github.com/Karlen-ll/debug-web/issues)
+- [NPM Package](https://www.npmjs.com/package/debug-web)

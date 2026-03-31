@@ -63,12 +63,13 @@ yarn add debug-web
 
 | Параметр | Тип                             | По умолчанию                     | Описание                                                                   |
 |----------|---------------------------------|----------------------------------|----------------------------------------------------------------------------|
-| `app`    | `string` \| `null`              | `'debug'`                   | Уникальное имя приложения для разделения данных                            |
+| `app`    | `string` \| `null`              | `'debug'`                        | Уникальное имя приложения для разделения данных                            |
 | `level`  | `DebugLogLevel`                 | `'log'`                          | Минимальный уровень логирования (сообщения ниже этого уровня не выводятся) |
 | `prop`   | `string` \| `null`              | `'debug'`                        | Имя глобальной переменной для доступа к данным (`null` — не создавать)     |
-| `data`   | `Record<string, unknown>`       | —                                | Начальные отладочные данные                                                |
+| `data`   | `Record<string, unknown>`       | `undefined`                      | Начальные отладочные данные                                                |
 | `local`  | `boolean`                       | `false`                          | Сохранять уровень в `localStorage` (иначе `sessionStorage`)                |
 | `native` | `boolean`                       | `false`                          | Использовать нативные методы консоли (без стилей)                          |
+| `onLog`  | `(level, attrs) => void`        | `undefined`                      | Функция вызывается после каждого лога                                      |
 | `title`  | `Record<string, string>`        | `undefined`                      | Заголовки для пользовательских уровней логирования                         |
 | `alias`  | `Record<string, DebugLogLevel>` | см. [ниже](#алиасы-по-умолчанию) | Пользовательские алиасы для `createDebug`                                  |
 | `style`  | `Record<DebugLogLevel, string>` | см. [ниже](#стили-по-умолчанию)  | CSS-стили для уровней логирования                                          |
@@ -142,11 +143,11 @@ export const debug = new DebugWeb({
 
 #### Работа с данными
 
-| Метод  | Тип                                               | Комментарий                                                                           |
-|--------|---------------------------------------------------|---------------------------------------------------------------------------------------|
-| `set`  | `(data: DebugWebData) => void`                    | Сохраняет отладочные данные (объединяет)                                              |
-| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Возвращает копию всех данных. Если передать `true` — добавляет вспомогательные методы |
-| `dump` | `(keys: string[], options?: DumpOptions) => void` | Выводит данные в виде таблицы (игнорирует уровни логирования)                         |
+| Метод  | Тип                                                | Комментарий                                                                                       |
+|--------|----------------------------------------------------|---------------------------------------------------------------------------------------------------|
+| `set`  | `(data: DebugWebData, storage?: boolean) => void`  | Сохраняет отладочные данные (объединяет). Если `storage=true` — сохраниние будет в sessionStorage |
+| `get`  | `(storage?: boolean) => DebugWebData \| undefined` | Возвращает копию данных. Если передать `true` — возьмёт данные из sessionStorag                   |
+| `dump` | `(keys: string[], options?: DumpOptions) => void`  | Выводит данные в виде таблицы (игнорирует уровни логирования)                                     |
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -163,7 +164,7 @@ type DumpOptions = {
 | Метод            | Тип             | Комментарий                          |
 |------------------|-----------------|--------------------------------------|
 | `level` (getter) | `DebugLogLevel` | Получить текущий уровень логирования |
-| `level` (setter) | `DebugLogLevel` | Задать уровень логирования          |
+| `level` (setter) | `DebugLogLevel` | Задать уровень логирования           |
 
 #### Стилизация
 
@@ -192,6 +193,11 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // изменить уровень логирования
 ```
 
+## Примеры
+
+- [Сохранение в файл](example/download.ts)
+- [Saving history](example/history.ts)
+
 ## Поддержка
 
 Если эта библиотека полезна для вас, рассмотрите возможность поддержать её разработку:
@@ -205,7 +211,7 @@ MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Ссылки
 
-- [📝 История изменений](CHANGELOG.md)
-- [💻 Исходный код](https://github.com/Karlen-ll/debug-web)
-- [🐛 Отчеты об ошибках](https://github.com/Karlen-ll/debug-web/issues)
-- [📦 NPM пакет](https://www.npmjs.com/package/debug-web)
+- [История изменений](CHANGELOG.md)
+- [Исходный код](https://github.com/Karlen-ll/debug-web)
+- [Отчеты об ошибках](https://github.com/Karlen-ll/debug-web/issues)
+- [NPM пакет](https://www.npmjs.com/package/debug-web)

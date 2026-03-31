@@ -24,15 +24,11 @@ export interface DebugWebOptions {
   /** Styles map for different logging levels */
   style?: DebugWebStyle;
 
-  /** Callback function called on each log entry
+  /** Функция обратного вызова, вызываемая для каждой записи журнала
    * @param level - Log level of the message
    * @param attrs - Array of logged arguments
    * @desc Useful for sending logs to external systems */
   onLog?: DebugWebOnLog;
-
-  /** Use Storage for data storage instead of window property
-   * @default false */
-  storage?: boolean;
 
   /** Use localStorage instead of sessionStorage
    * @default false */
@@ -45,6 +41,9 @@ export interface DebugWebOptions {
 
 export type DebugWebAliasMap = Record<string, DebugWebLogLevel>
 export type DebugWebTitleMap = Record<string, string>
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+export type DebugWebFunctionMap = Record<string, Function>
 
 export type CreateDebugOptions = DebugWebOptions & {
   /** Aliases map */

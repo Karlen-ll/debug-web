@@ -64,12 +64,13 @@ comportamiento específico:
 
 | Parámetro | Tipo                            | Por defecto                       | Descripción                                                                 |
 |-----------|---------------------------------|-----------------------------------|-----------------------------------------------------------------------------|
-| `app`     | `string` \| `null`              | `'debug'`                    | Nombre único de la aplicación para separar datos                            |
+| `app`     | `string` \| `null`              | `'debug'`                         | Nombre único de la aplicación para separar datos                            |
 | `level`   | `DebugLogLevel`                 | `'log'`                           | Nivel mínimo de registro (no se muestran mensajes por debajo de este nivel) |
 | `prop`    | `string` \| `null`              | `'debug'`                         | Nombre de variable global para acceder a datos (`null` — no crear)          |
-| `data`    | `Record<string, unknown>`       | —                                 | Datos iniciales de depuración                                               |
+| `data`    | `Record<string, unknown>`       | `undefined`                       | Datos iniciales de depuración                                               |
 | `local`   | `boolean`                       | `false`                           | Guardar el nivel en `localStorage` (de lo contrario en `sessionStorage`)    |
 | `native`  | `boolean`                       | `false`                           | Usar métodos nativos de la consola (sin estilos)                            |
+| `onLog`   | `(level, attrs) => void`        | `undefined`                       | Función llamada después de cada registro                                    |
 | `title`   | `Record<string, string>`        | `undefined`                       | Títulos para niveles de registro personalizados                             |
 | `alias`   | `Record<string, DebugLogLevel>` | ver [abajo](#alias-por-defecto)   | Alias personalizados para `createDebug`                                     |
 | `style`   | `Record<DebugLogLevel, string>` | ver [abajo](#estilos-por-defecto) | Estilos CSS para los niveles de registro                                    |
@@ -143,11 +144,11 @@ Crea un proxy con alias y soporte para niveles personalizados.
 
 #### Manejo de datos
 
-| Método | Tipo                                              | Comentario                                                                  |
-|--------|---------------------------------------------------|-----------------------------------------------------------------------------|
-| `set`  | `(data: DebugWebData) => void`                    | Guarda los datos de depuración (los fusiona)                                |
-| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | Devuelve una copia de todos los datos. Si es `true`, añade métodos de ayuda |
-| `dump` | `(keys: string[], options?: DumpOptions) => void` | Imprime los datos en formato tabla (ignora niveles de registro)             |
+| Método | Tipo                                               | Comentario                                                                                 |
+|--------|----------------------------------------------------|--------------------------------------------------------------------------------------------|
+| `set`  | `(data: DebugWebData, storage?: boolean) => void`  | Guarda los datos de depuración (los fusiona). Si `storage=true` — guarda en sessionStorage |
+| `get`  | `(storage?: boolean) => DebugWebData \| undefined` | Devuelve una copia de los datos. Si se pasa `true`, obtiene de sessionStorage              |
+| `dump` | `(keys: string[], options?: DumpOptions) => void`  | Imprime los datos en formato tabla (ignora niveles de registro)                            |
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -193,6 +194,11 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // cambiar el nivel de registro
 ```
 
+## Ejemplos
+
+- [Guardar en archivo](example/download.ts)
+- [Guardar historial](example/history.ts)
+
 ## Soporte
 
 Si esta biblioteca te resulta útil, considera apoyar su desarrollo:
@@ -206,7 +212,7 @@ MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Enlaces
 
-- [📝 Historial de cambios](CHANGELOG.md)
-- [💻 Código fuente](https://github.com/Karlen-ll/debug-web)
-- [🐛 Reportes de errores](https://github.com/Karlen-ll/debug-web/issues)
-- [📦 Paquete NPM](https://www.npmjs.com/package/debug-web)
+- [Historial de cambios](CHANGELOG.md)
+- [Código fuente](https://github.com/Karlen-ll/debug-web)
+- [Reportes de errores](https://github.com/Karlen-ll/debug-web/issues)
+- [Paquete NPM](https://www.npmjs.com/package/debug-web)

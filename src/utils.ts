@@ -19,6 +19,11 @@ export const getWindowKey = (name: string, raw?: boolean) => {
 /** Ensures value is always returned as an array */
 export const getArray = <T = unknown>(value?: T[] | T | null): T[]  => Array.isArray(value) ? value : [value as T];
 
+/** Adds items to array while keeping it within size limit (FIFO) */
+export const getLimitedArray = <T>(array: T[] = [], value: T[] | T, limit = 10): T[] => {
+  return [...array, ...getArray(value)].slice(-limit);
+};
+
 /** Determines console group method based on open state */
 export const getGroupMethod = (value?: boolean) : 'group' | 'groupCollapsed' => `group${value ? '' : 'Collapsed'}`;
 
@@ -87,7 +92,7 @@ export const stringify = (data: stringifyParams[0], space?: stringifyParams[2], 
 
 type definePropertyParams = Parameters<typeof Object.defineProperty>
 
-/**  */
+/** Defines a configurable property on the window object */
 export const defineWindowProperty = (key: keyof Window | string, props: definePropertyParams[2]) => {
   return Object.defineProperty(window, key, { configurable: true, ...props });
 };

@@ -5,7 +5,7 @@ window.debugWeb = createDebug({
   data: {
     message: 'Welcome!',
     description: 'Browser debug utility',
-    time: new Date().toISOString(),
+    time: new Date().toLocaleString(),
   },
   style: { custom: 'color: orange', debug: 'color:#155adc' },
   title: { custom: 'Title!' },

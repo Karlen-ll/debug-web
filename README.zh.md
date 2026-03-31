@@ -61,17 +61,18 @@ yarn add debug-web
 
 ## 选项
 
-| 参数       | 类型                              | 默认值            | 描述                                              |
-|----------|---------------------------------|----------------|-------------------------------------------------|
-| `app`    | `string` \| `null`              | `'debug'` | 唯一的应用程序名称，用于分离数据                                |
-| `level`  | `DebugLogLevel`                 | `'log'`        | 最低日志级别（低于此级别的消息将不会输出）                           |
-| `prop`   | `string` \| `null`              | `'debug'`      | 用于访问数据的全局变量名（`null` — 不创建）                      |
-| `data`   | `Record<string, unknown>`       | —              | 初始调试数据                                          |
-| `local`  | `boolean`                       | `false`        | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
-| `native` | `boolean`                       | `false`        | 使用原生控制台方法（不带样式）                                 |
-| `title`  | `Record<string, string>`        | `undefined`    | 自定义日志级别的标题                                      |
-| `alias`  | `Record<string, DebugLogLevel>` | 见 [下方](#默认别名)  | `createDebug` 的自定义别名                            |
-| `style`  | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式)  | 日志级别的 CSS 样式                                    |
+| 参数       | 类型                              | 默认值           | 描述                                              |
+|----------|---------------------------------|---------------|-------------------------------------------------|
+| `app`    | `string` \| `null`              | `'debug'`     | 唯一的应用程序名称，用于分离数据                                |
+| `level`  | `DebugLogLevel`                 | `'log'`       | 最低日志级别（低于此级别的消息将不会输出）                           |
+| `prop`   | `string` \| `null`              | `'debug'`     | 用于访问数据的全局变量名（`null` — 不创建）                      |
+| `data`   | `Record<string, unknown>`       | `undefined`   | 初始调试数据                                          |
+| `local`  | `boolean`                       | `false`       | 将级别保存在 `localStorage` 中（否则保存在 `sessionStorage`） |
+| `native` | `boolean`                       | `false`       | 使用原生控制台方法（不带样式）                                 |
+| `onLog`  | `(level, attrs) => void`        | `undefined`   | 每次日志记录后调用的函数                                    |
+| `title`  | `Record<string, string>`        | `undefined`   | 自定义日志级别的标题                                      |
+| `alias`  | `Record<string, DebugLogLevel>` | 见 [下方](#默认别名) | `createDebug` 的自定义别名                            |
+| `style`  | `Record<DebugLogLevel, string>` | 见 [下方](#默认样式) | 日志级别的 CSS 样式                                    |
 
 ```typescript
 type DebugLogLevel = 'debug' | 'log' | 'info' | 'success' | 'warn' | 'error' | string;
@@ -142,11 +143,11 @@ export const debug = new DebugWeb({
 
 #### 数据处理
 
-| 方法     | 类型                                                | 注释                            |
-|--------|---------------------------------------------------|-------------------------------|
-| `set`  | `(data: DebugWebData) => void`                    | 保存调试数据（合并数据）                  |
-| `get`  | `(api?: boolean) => DebugWebData  \| undefined`   | 返回所有数据的副本。如果传入 `true`，则添加辅助方法 |
-| `dump` | `(keys: string[], options?: DumpOptions) => void` | 以表格形式输出数据（忽略日志级别）             |
+| 方法     | 类型                                                 | 注释                                                |
+|--------|----------------------------------------------------|---------------------------------------------------|
+| `set`  | `(data: DebugWebData, storage?: boolean) => void`  | 保存调试数据（合并）。如果 `storage=true` — 保存到 sessionStorage |
+| `get`  | `(storage?: boolean) => DebugWebData \| undefined` | 返回数据的副本。如果传入 `true`，则从 sessionStorage 获取          |
+| `dump` | `(keys: string[], options?: DumpOptions) => void`  | 以表格形式输出数据（忽略日志级别）                                 |
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -192,6 +193,11 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // 修改日志级别
 ```
 
+## 示例
+
+- [保存到文件](example/download.ts)
+- [保存历史记录](example/history.ts)
+
 ## 支持
 
 如果这个库对您有帮助，请考虑支持它的开发。
@@ -205,7 +211,7 @@ MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## 链接
 
-- [📝 更新日志](CHANGELOG.md)
-- [💻 源代码](https://github.com/Karlen-ll/debug-web)
-- [🐛 问题反馈](https://github.com/Karlen-ll/debug-web/issues)
-- [📦 NPM 包](https://www.npmjs.com/package/debug-web)
+- [更新日志](CHANGELOG.md)
+- [源代码](https://github.com/Karlen-ll/debug-web)
+- [问题反馈](https://github.com/Karlen-ll/debug-web/issues)
+- [NPM 包](https://www.npmjs.com/package/debug-web)

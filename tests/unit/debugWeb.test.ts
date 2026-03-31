@@ -265,6 +265,32 @@ describe('DebugWeb', () => {
     });
   });
 
+  describe('storage operations', () => {
+    let stgMock: Storage;
+
+    beforeEach(() => {
+      reset();
+      stgMock = { getItem: vi.fn(), setItem: vi.fn(), removeItem: vi.fn(), clear: vi.fn(), key: vi.fn(), length: 0 };
+      vi.stubGlobal('sessionStorage', stgMock);
+    });
+
+    afterEach(() => {
+      vi.unstubAllGlobals();
+    });
+
+    it('get with storage=true calls getStoredValue', () => {
+      debug.get(true);
+
+      expect(stgMock.getItem).toHaveBeenCalled();
+    });
+
+    it('set with storage=true calls setStoredValue', () => {
+      debug.set(DATA_FRAGMENT_1, true);
+
+      expect(stgMock.setItem).toHaveBeenCalled();
+    });
+  });
+
   describe('edge cases', () => {
     beforeEach(() => {
       vi.stubGlobal('window', undefined);

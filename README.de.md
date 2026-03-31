@@ -67,9 +67,10 @@ verarbeitet:
 | `app`     | `string` \| `null`              | `'debug'`                       | Eindeutiger App-Name zur Trennung von Daten                                  |
 | `level`   | `DebugLogLevel`                 | `'log'`                         | Minimale Protokollierungsebene (Nachrichten darunter werden nicht angezeigt) |
 | `prop`    | `string` \| `null`              | `'debug'`                       | Globaler Variablenname für Datenzugriff (`null` — nicht erstellen)           |
-| `data`    | `Record<string, unknown>`       | —                               | Initiale Debug-Daten                                                         |
+| `data`    | `Record<string, unknown>`       | `undefined`                     | Initiale Debug-Daten                                                         |
 | `local`   | `boolean`                       | `false`                         | Ebene in `localStorage` speichern (sonst `sessionStorage`)                   |
 | `native`  | `boolean`                       | `false`                         | Native Konsolenmethoden (ohne Stile) verwenden                               |
+| `onLog`   | `(level, attrs) => void`        | `undefined`                     | Funktion, die nach jedem Log aufgerufen wird                                 |
 | `title`   | `Record<string, string>`        | `undefined`                     | Titel für benutzerdefinierte Protokollierungsebenen                          |
 | `alias`   | `Record<string, DebugLogLevel>` | siehe [unten](#standard-aliase) | Benutzerdefinierte Aliase für `createDebug`                                  |
 | `style`   | `Record<DebugLogLevel, string>` | siehe [unten](#standardstile)   | CSS-Stile für die Protokollierungsebenen                                     |
@@ -143,11 +144,11 @@ Erstellt einen Proxy mit Aliasen und Unterstützung für benutzerdefinierte Eben
 
 #### Datenverarbeitung
 
-| Methode | Typ                                               | Kommentar                                                                       |
-|---------|---------------------------------------------------|---------------------------------------------------------------------------------|
-| `set`   | `(data: DebugWebData) => void`                    | Speichert Debug-Daten (zusammenführen)                                          |
-| `get`   | `(api?: boolean) => DebugWebData  \| undefined`   | Gibt eine Kopie aller Daten zurück. Bei `true` werden Hilfsmethoden hinzugefügt |
-| `dump`  | `(keys: string[], options?: DumpOptions) => void` | Gibt Daten als Tabelle aus (ignoriert Protokollierungsebenen)                   |
+| Methode | Typ                                                | Kommentar                                                                                       |
+|---------|----------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| `set`   | `(data: DebugWebData, storage?: boolean) => void`  | Speichert Debug-Daten (zusammenführen). Wenn `storage=true` — speichert in sessionStorage       |
+| `get`   | `(storage?: boolean) => DebugWebData \| undefined` | Gibt eine Kopie der Daten zurück. Wenn `true` übergeben wird, wird aus sessionStorage abgerufen |
+| `dump`  | `(keys: string[], options?: DumpOptions) => void`  | Gibt Daten als Tabelle aus (ignoriert Protokollierungsebenen)                                   |
 
 ```typescript
 type DebugWebData = Record<string, unknown>
@@ -193,6 +194,11 @@ debug // { error: null, user: {...}, setLevel: f }
 debug.setLevel() // Protokollierungsebene ändern
 ```
 
+## Beispiele
+
+- [In Datei speichern](example/download.ts)
+- [Verlauf speichern](example/history.ts)
+
 ## Unterstützung
 
 Wenn diese Bibliothek für Sie nützlich ist, ziehen Sie bitte in Betracht, ihre Entwicklung zu unterstützen:
@@ -206,7 +212,7 @@ MIT © [Karlen Pireverdiev](https://github.com/Karlen-ll)
 
 ## Links
 
-- [📝 Änderungsprotokoll](CHANGELOG.md)
-- [💻 Quellcode](https://github.com/Karlen-ll/debug-web)
-- [🐛 Fehlermeldungen](https://github.com/Karlen-ll/debug-web/issues)
-- [📦 NPM-Paket](https://www.npmjs.com/package/debug-web)
+- [Änderungsprotokoll](CHANGELOG.md)
+- [Quellcode](https://github.com/Karlen-ll/debug-web)
+- [Fehlermeldungen](https://github.com/Karlen-ll/debug-web/issues)
+- [NPM-Paket](https://www.npmjs.com/package/debug-web)

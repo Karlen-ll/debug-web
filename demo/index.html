@@ -17,6 +17,10 @@
       debugWeb.level = level
       document.getElementById('level').textContent = level;
     }
+
+    function set() {
+      console.log(debugWeb.set({ a: 1 }, true));
+    }
   </script>
 </head>
 <body>
@@ -29,7 +33,7 @@
   <div class="section">
     <h2 class="title">Controls</h2>
     <div class="button-grid">
-      <button class="button" onclick="debugWeb.update({ time: new Date().toISOString() })">Update</button>
+      <button class="button" onclick="debugWeb.update({ time: new Date().toLocaleString() })">Update</button>
       <button class="button" onclick="changeLevel('debug')">⚙️ Debug level</button>
       <button class="button" onclick="changeLevel('error')">⚙️ Error level</button>
       <button class="button" onclick="logs()">ℹ️ Logs</button>
@@ -78,6 +82,10 @@
 
     <div class="button-grid">
       <button class="button" onclick="debugWeb.trace('Trace ℹ️')">trace</button>
+    </div>
+
+    <div class="button-grid">
+      <button class="button" onclick="set()">set</button>
     </div>
   </div>
 </div>

@@ -13,7 +13,10 @@ import {
 } from '@/utils';
 import { stylizeAttrs } from './stylize';
 import { DEFAULT_LVL_MAP, DEBUG, LOG, INFO, WARN, ERROR, TABLE, DEFAULT_STYLE } from '@/const';
-import { ConsoleMethod, DebugWebData, DebugWebStyle, DebugWebOptions, DebugWebLogLevel, DebugWebOnLog } from '@/types';
+import type {
+  ConsoleMethod, DebugWebData, DebugWebStyle, DebugWebOptions, DebugWebLogLevel, DebugWebOnLog,
+  DebugWebFunctionMap
+} from '@/types';
 
 /** Class for centralized collection and output of debugging information */
 export class DebugWeb {
@@ -45,11 +48,15 @@ export class DebugWeb {
   /** Log levels mapping */
   declare protected _map: Partial<Record<DebugWebLogLevel, number>>;
 
+  /** Functions
+   * @desc Map of functions available in the console */
+  declare protected _fns: DebugWebFunctionMap;
+
   /** Window instance key */
   declare protected __w: keyof Window;
 
   /** Storage key for level
-   * @desc For the data uses the _id key  */
+   * @desc Uses the _id key for data */
   declare protected __s: string;
 
   constructor(options?: DebugWebOptions) {
@@ -57,100 +64,109 @@ export class DebugWeb {
     this.attach();
   }
 
+  // Alias for code minification
+  protected _ = this.call;
+
   /** Create window property for data access */
   attach() {
     if (!this._prp || isSSR()) return;
 
     defineWindowProperty(this._prp, {
-      get: () => ({ ...this.get(), setLevel: this.setLvl.bind(this) })
+      get: () => ({
+        ...this.get(),
+        ...(Object.entries(this._fns).reduce((acc, [name, fn]) => {
+          acc[name] = fn.bind(this);
+          return acc;
+        }, {} as DebugWebFunctionMap))
+      })
     });
   }
 
   /** Output message to Web console */
   log(...attrs: unknown[]) {
-    this.call(LOG, attrs, LOG, true);
+    this._(LOG, attrs, LOG, true);
   }
 
   /** Output informational message */
   info(...attrs: unknown[]) {
-    this.call(INFO, attrs, INFO, true);
+    this._(INFO, attrs, INFO, true);
   }
 
   /** Output warning message (not stylized) */
   warn(...attrs: unknown[]) {
-    this.call(WARN, attrs, WARN);
+    this._(WARN, attrs, WARN);
   }
 
   /** Output error message (not stylized) */
   error(...attrs: unknown[]) {
-    this.call(ERROR, attrs, ERROR);
+    this._(ERROR, attrs, ERROR);
   }
 
   /** Output debug message with low priority */
   debug(message?: unknown, ...attrs: unknown[]) {
-    this.call(DEBUG, [message, ...attrs], DEBUG, true);
+    this._(DEBUG, [message, ...attrs], DEBUG, true);
   }
 
   /** Open a group */
   group(open?: boolean, level: DebugWebLogLevel = LOG, ...attrs: unknown[]) {
-    this.call(getGroupMethod(open), attrs, level, true);
+    this._(getGroupMethod(open), attrs, level, true);
   }
 
   /** Close the group */
   groupEnd(level: DebugWebLogLevel = LOG) {
-    this.call('groupEnd', [], level);
+    this._('groupEnd', [], level);
   }
 
   /** Output an object */
   dir(value: unknown, options?: unknown) {
-    this.call('dir', [value, options], LOG);
+    this._('dir', [value, options], LOG);
   }
 
   /** Output XML/HTML tree of elements */
   dirxml(...attrs: unknown[]) {
-    this.call('dirxml', attrs, LOG);
+    this._('dirxml', attrs, LOG);
   }
 
   /** Log number of times called with given label */
   count(label?: string) {
-    this.call('count', label, LOG);
+    this._('count', label, LOG);
   }
 
   /** Reset counter for the given label */
   countReset(label?: string) {
-    this.call('countReset', label, LOG);
+    this._('countReset', label, LOG);
   }
 
   /** Output stack trace */
   trace(...attrs: unknown[]) {
-    this.call('trace', attrs);
+    this._('trace', attrs);
   }
 
   /** Output a table */
   table(data: unknown, properties?: string[]) {
-    this.call(TABLE, [data, properties]);
+    this._(TABLE, [data, properties]);
   }
 
   /** Start timer for execution time measurement */
   time(label?: string) {
-    this.call('time', label);
+    this._('time', label);
   }
 
   /** Output current timer value */
   timeLog(label?: string, ...attrs: unknown[]) {
-    this.call('timeLog', [label, ...attrs]);
+    this._('timeLog', [label, ...attrs]);
   }
 
   /** Finish execution time measurement */
   timeEnd(label?: string) {
-    this.call('timeEnd', label);
+    this._('timeEnd', label);
   }
 
   /** Update debugging data */
   set(data?: DebugWebData, storage?: boolean) {
     if (!data || isSSR()) return;
 
-    const value: DebugWebData = Object.assign(storage ? getStoredObject(this._id) : window[this.__w] || {}, data);
+    const value: DebugWebData = Object.assign((storage ? getStoredObject(this._id) : window[this.__w]) || {}, data);
 
     for (const key in value) {
       if (value[key] === undefined) {
@@ -192,6 +208,25 @@ export class DebugWeb {
     Object.assign(this._stl, style);
   }
 
+  /** Core method for logging with level filtering and formatting
+   * @param method - Console method to use (log, info, warn, etc.)
+   * @param attrs - Single value or array of values to log
+   * @param level - Logging level for filtering (default: based on method)
+   * @param stylize - Apply CSS styling to the output (default: false)
+   * @param force - Bypass level filtering and always output (default: false)
+   * @returns void, exits early if level is below current threshold (unless forced)
+   */
+  call(method: ConsoleMethod, attrs: unknown | unknown[], level?: DebugWebLogLevel, stylize = false, force = false) {
+    // Default value, all unspecified values will have priority — INFO
+    const info = this._map[INFO]!;
+
+    if (!force && this.getLvl(level, info) < this.getLvl(this._lvl, info)) {
+      return;
+    }
+
+    this.print(method, getArray(attrs), level, stylize ? !this._ntv : false);
+  }
+
   /** Display a formatted dump of debugging data by selected keys
    * @param keys - Array of property names to include in the dump
    * @param options - Configuration options for the dump display
@@ -213,7 +248,7 @@ export class DebugWeb {
     if (!data || !keys.length) return;
     const isSimple = !(options && options.title);
 
-    this.call(
+    this._(
       getGroupMethod(options && options.open),
       [isSimple ? data[keys[0]] || keys[0] : isFunc(options.title) ? options.title(data) : options.title],
       level,
@@ -222,10 +257,10 @@ export class DebugWeb {
     );
 
     if (options && options.hint) {
-      this.call(LOG, options.hint, options.level, false, true);
+      this._(LOG, options.hint, options.level, false, true);
     }
 
-    this.call(
+    this._(
       TABLE,
       [keys.reduce<DebugWebData>((acc, key, index) => {
         if (!(isSimple && index === 0) && isDefined(data[key])) {
@@ -239,26 +274,7 @@ export class DebugWeb {
       true
     );
 
-    this.call('groupEnd', [], level, false, true);
-  }
-
-  /** Core method for logging with level filtering and formatting
-   * @param method - Console method to use (log, info, warn, etc.)
-   * @param attrs - Single value or array of values to log
-   * @param level - Logging level for filtering (default: based on method)
-   * @param stylize - Apply CSS styling to the output (default: false)
-   * @param force - Bypass level filtering and always output (default: false)
-   * @returns void, exits early if level is below current threshold (unless forced)
-   */
-  call(method: ConsoleMethod, attrs: unknown | unknown[], level?: DebugWebLogLevel, stylize = false, force = false) {
-    // Default value, all unspecified values will have priority — INFO
-    const info = this._map[INFO]!;
-
-    if (!force && this.getLvl(level, info) < this.getLvl(this._lvl, info)) {
-      return;
-    }
-
-    this.print(method, getArray(attrs), level, stylize ? !this._ntv : false);
+    this._('groupEnd', [], level, false, true);
   }
 
   /** Configure instance */
@@ -279,6 +295,7 @@ export class DebugWeb {
 
     this._lvl = getStoredValue(this.__s, this._ls) || options && options.level || LOG;
     this._stl = { ...DEFAULT_STYLE, ...(options ? options.style : undefined) };
+    this._fns = { setLevel: this.setLvl };
   }
 
   /** Get logging level priority number */

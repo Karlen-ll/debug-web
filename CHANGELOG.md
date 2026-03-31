@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.4.0] - 2026-04-01
+- Improved code minification, added alias
+- Added ability to save data to sessionStorage
+- Minor optimizations made, examples added
+
+## [2.3.0] - 2026-03-16
+- Fixed bugs
+- Improved the `dump` method 
+- Added ability for custom logging at the `debug` level
+
 ## [2.0.0] - 2026-03-11
 - Add function `createDebug`
 - Add method `dump`
